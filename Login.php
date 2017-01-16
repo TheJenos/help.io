@@ -57,10 +57,7 @@ if (isset($_SESSION['userdata'])) {
                 background: url('images/18-comments-a-helping-hand-ETv8U8-clipart.jpg');
                 background-size: 1366px;
             }
-            .well{
-                border: 1px solid rgba(124, 120, 120, 0.36); 
-                background: rgba(0, 0, 0, 0.52);
-            }
+            
         </style>
     </head>
     <body >
@@ -75,21 +72,21 @@ if (isset($_SESSION['userdata'])) {
             <div class="col-md-4"></div>
             <div class="col-md-4">
                 <div class="alert alert-danger" id="error"></div>
-                <div class="well" style="margin: 5px;color: white;margin: 5px;box-shadow: 0px 0px 10px black;">
+                <div class="well" style="margin: 5px;color: white;margin: 5px;">
                     <form role="form" id="myform" action="backend.php" method="POST" novalidate="" >
                         <div class="form-group">
                             <label for="email">Username or Email</label>
-                            <input type="text" name="username" class="form-control" id="user" ng-model="username" autocomplete="off">
+                            <input type="text" name="username" class="form-control simple" id="user" ng-model="username" autocomplete="off">
                         </div>
                         <div class="form-group">
                             <label for="pwd">Password</label>
-                            <input type="password" name="pass" class="form-control" id="pass" ng-model="pass" autocomplete="off">
+                            <input type="password" name="pass" class="form-control simple" id="pass" ng-model="pass" autocomplete="off">
                         </div>
                         <div class="checkbox">
                             <label><input name="re" type="checkbox"> Remember me</label>
                         </div>
                         <div style="text-align: right">
-                            <input type="button" id="loginbtn" name="login" class="btn btn-success" value="Login">
+                            <input type="button" id="loginbtn" name="login" class="simple" value="Login">
                         </div>
                     </form>
                 </div>

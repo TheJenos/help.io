@@ -6,5 +6,64 @@
 <link rel="stylesheet" type="text/css" href="css/freelancer.min.css">
 <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
 <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css">
-
+<style>
+    .simple{
+        padding: 5px;
+        border: 1px solid #ffffff;
+        color: #ffffff;
+        font-size: 0.7em;
+        text-transform: uppercase;
+        margin: 10px 0;
+        display: inline-block;
+        opacity: 0.65;
+        padding: 5px 15px;
+        text-align: center;
+        text-decoration: none;
+        font-weight: 600;
+        letter-spacing: 1px;
+        background: transparent;
+    }
+    input{
+        text-align: left !important;
+        outline: none;
+    }
+    input[type=button]{
+        text-align: center;
+    }
+    
+    .simple:hover {
+        opacity: 1;
+    }
+    .well{
+        color: white;
+        border: 0px; 
+        background: #141414;
+        /*box-shadow: 0px 0px 5px black;*/
+        border-radius: 0px;
+    }
+    h1 {
+        letter-spacing: 5px;
+        text-transform: uppercase;
+        font: 40px "Lato", sans-serif;
+        color: #ffffff;
+    }
+    h2 {
+        letter-spacing: 5px;
+        text-transform: uppercase;
+        font: 25px "Lato", sans-serif;
+        color: #ffffff;
+    }
+    h3 {
+        letter-spacing: 5px;
+        text-transform: uppercase;
+        font: 20px "Lato", sans-serif;
+        color: #111;
+    }
+    label {
+        letter-spacing: 5px;
+        text-transform: uppercase;
+        font: 10px "Lato", sans-serif;
+        color: white;
+    }
+</style>
 

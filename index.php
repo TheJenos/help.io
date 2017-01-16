@@ -37,6 +37,7 @@ if (isset($_GET['logout'])) {
 
             body{
                 background: #141414;
+                font: "Lato", sans-serif;
             }
             .cusname:after{
                 content: ".IO";
@@ -168,7 +169,26 @@ if (isset($_GET['logout'])) {
                 opacity: 0.8;
             }
             .page-scroll a{
-                font-family: 'Roboto', Arial, sans-serif;
+                font: 14px "Lato", sans-serif;
+            }
+            
+            h1 {
+                letter-spacing: 5px;
+                text-transform: uppercase;
+                font: 40px "Lato", sans-serif;
+                color: #ffffff;
+            }
+            h2 {
+                letter-spacing: 5px;
+                text-transform: uppercase;
+                font: 25px "Lato", sans-serif;
+                color: #ffffff;
+            }
+            h3 {
+                letter-spacing: 5px;
+                text-transform: uppercase;
+                font: 20px "Lato", sans-serif;
+                color: #111;
             }
         </style>
         <script type="text/javascript">
@@ -246,13 +266,12 @@ if (isset($_GET['logout'])) {
                     <?php if (isset($_SESSION['userdata'])) { ?>
                         <div class="col-md-4" ng-controller="userinfo">
                             <figure class="snip1336">
-                                <img ng-src="<?php echo $hostname; ?>{{User.Upic}}" alt="sample87" />
+                                <img ng-src="<?php echo $hostname; ?>{{User.Ubgimage}}" alt="sample87" />
                                 <figcaption>
                                     <img ng-src="<?php echo $hostname; ?>{{User.Upic}}" width="64" alt="profile-sample4" class="profile" />
                                     <h2>{{User.Uname}}<span>{{User.Jname}}</span></h2>
                                     <p>{{User.Udiscription}}</p>
-                                    <a href="#" class="follow">Follow</a>
-                                    <a href="#" class="info">More Info</a>
+                                    <a href="#" style="width:100%" class="">Edit Profile</a>
                                 </figcaption>
                             </figure>
 
@@ -267,8 +286,9 @@ if (isset($_GET['logout'])) {
                 </div>
             </div>
         </div>
-        <div class="" style="height: 200px;background: white">
-
+        <div style="color: #777;background-color:white;text-align:center;padding:50px 80px;text-align: justify;">
+            <h3 style="text-align:center;">Parallax Demo</h3>
+            <p>Parallax scrolling is a web site trend where the background content is moved at a different speed than the foreground content while scrolling. Nascetur per nec posuere turpis, lectus nec libero turpis nunc at, sed posuere mollis ullamcorper libero ante lectus, blandit pellentesque a, magna turpis est sapien duis blandit dignissim. Viverra interdum mi magna mi, morbi sociis. Condimentum dui ipsum consequat morbi, curabitur aliquam pede, nullam vitae eu placerat eget et vehicula. Varius quisque non molestie dolor, nunc nisl dapibus vestibulum at, sodales tincidunt mauris ullamcorper, dapibus pulvinar, in in neque risus odio. Accumsan fringilla vulputate at quibusdam sociis eleifend, aenean maecenas vulputate, non id vehicula lorem mattis, ratione interdum sociis ornare. Suscipit proin magna cras vel, non sit platea sit, maecenas ante augue etiam maecenas, porta porttitor placerat leo.</p>
         </div>
         <div class="parallax1">
 
