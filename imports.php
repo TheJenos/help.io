@@ -23,6 +23,11 @@
         letter-spacing: 1px;
         background: transparent;
     }
+    hr{
+        color: white;
+        height: 1px;
+        margin: 6px 0px;
+    }
     input{
         text-align: left !important;
         outline: none;
@@ -30,7 +35,7 @@
     input[type=button]{
         text-align: center;
     }
-    
+
     .simple:hover {
         opacity: 1;
     }

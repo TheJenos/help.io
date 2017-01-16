@@ -281,6 +281,7 @@ if (isset($_GET['logout'])) {
                         <div class="alert alert-danger" id="error"></div>
                         <div class="well" style="">
                             dfsdf
+                            <hr>
                         </div>
                     </div>
                 </div>
