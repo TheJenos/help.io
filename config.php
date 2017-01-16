@@ -1,6 +1,6 @@
 <?php
 
-$hostname = 'http://localhost/WEBproject/';
+$hostname = 'http://localhost/help.io/';
 $host = 'localhost:3306';
 $root = 'root';
 $pass = '';
@@ -59,7 +59,7 @@ function links() {
 //===========================Login With Cookie===============================//
 function CookieLogin() {
     if (isset($_COOKIE['username'])) {
-        $data = SearchARow("user", array('*'), " Uemail='" . antisqli($_COOKIE['username']) . "' ");
+        $data = SearchARow("`user` NATURAL JOIN `jobs`", array('*'), " Uemail='" . antisqli($_COOKIE['username']) . "' ");
         if (!isset($data)) {
             session_destroy();
         }
@@ -192,6 +192,3 @@ function SearchToTable($table, $rows, $where, $id, $removebtn, $updatebtn) {
     echo $tr;
 }
 
-function SearchToJson() {
-    
-}

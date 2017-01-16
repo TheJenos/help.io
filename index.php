@@ -34,6 +34,7 @@ if (isset($_GET['logout'])) {
                     opacity: 0;
                 }
             }
+
             body{
                 background: #141414;
             }
@@ -55,34 +56,35 @@ if (isset($_GET['logout'])) {
                 border-radius: 0px;
             }
             .parallax {
-                padding-top: 50px;
+                /*padding-top: 50px;*/
             }
             .navbar-custom{
+                /*background: linear-gradient(#141414, rgba(20, 20, 20, 0.51));*/
                 background: #141414;
             }
-            .parallax:before {
-                content: "";
-                position: absolute;
-                left: 0;
-                right: 0;
-                top: 0;
-                z-index: -1;
-                background-image: url("images/desktop-pozadia-themes-tapety-wallpaper-pictures-creative.jpg");
-                height: 100%; 
+            .parallax1 {
+                background-image: url("images/18-comments-a-helping-hand-ETv8U8-clipart.jpg");
+                /*height: 760px;*/ 
+                padding-bottom: 100px;
                 background-attachment: fixed;
                 background-position: center;
                 background-repeat: no-repeat;
                 background-size: cover;
 
             }
+            .parallax {
+                background-image: url("images/desktop-pozadia-themes-tapety-wallpaper-pictures-creative.jpg");
+                /*height: 760px;*/ 
+                padding-bottom: 100px;
+                background-attachment: fixed;
+                background-position: center;
+                background-repeat: no-repeat;
+                background-size: cover;
+            }
             .snip1336 {
                 font-family: 'Roboto', Arial, sans-serif;
-                position: relative;
-                float: left;
                 overflow: hidden;
-                margin: 10px 1%;
                 min-width: 230px;
-                max-width: 315px;
                 width: 100%;
                 color: #ffffff;
                 text-align: left;
@@ -183,10 +185,8 @@ if (isset($_GET['logout'])) {
             });
 <?php if (isset($_SESSION['userdata'])) { ?>
                 app.controller("userinfo", function($scope, $interval) {
-                    $scope.Uname = "<?php echo $_SESSION['userdata']['Uname']; ?>";
-                    $scope.Upic = "<?php echo $_SESSION['userdata']['Upic']; ?>";
-                    $scope.Ubdate = "<?php echo $_SESSION['userdata']['Ubdate']; ?>";
-                    $scope.Ugen = "<?php echo $_SESSION['userdata']['Ugen']; ?>";
+                    var datas = '<?php echo json_encode($_SESSION['userdata']); ?>';
+                    $scope.User = $.parseJSON(datas);
                     $interval(function() {
                         $.post("backend.php", {
                             "uname": "<?php echo $_SESSION['userdata']['Uemail']; ?>",
@@ -194,15 +194,11 @@ if (isset($_GET['logout'])) {
                             "userinfo": true,
                             "json": true
                         }).done(function(response) {
-                            //alert(response);
                             var result = $.parseJSON(response);
                             if (result.status == "Fail") {
                                 showError(result.msg);
                             }
-                            $scope.Uname = result.user.Uname;
-                            $scope.Upic = result.user.Upic;
-                            $scope.Ubdate = result.user.Ubdate;
-                            $scope.Ugen = result.user.Ugen;
+                            $scope.User = result.user;
                         });
                     }, 5000);
                 });
@@ -210,62 +206,51 @@ if (isset($_GET['logout'])) {
         </script>
     </head>
     <body ng-app="home" >
-        <nav id="mainNav" style="border-radius:0px;margin-bottom: 0px;" class="navbar navbar-default  navbar-custom affix-top">
-            <div class="container">
-                <!-- Brand and toggle get grouped for better mobile display -->
-                <div class="navbar-header page-scroll">
-                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-                        <span class="sr-only">Toggle navigation</span><i class="glyphicon glyphicon-menu-down"></i>
-                    </button>
-                    <a class="navbar-brand" href="index.php" style="padding: 0px;"><h1 class="cusname" style="margin: 5px;color: white">Help</h1></a>
-                </div>
-                <!-- Collect the nav links, forms, and other content for toggling -->
-                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                    <ul class="nav navbar-nav navbar-right">
-                        <li class="hidden active">
-                            <a href="#page-top"></a>
-                        </li>
-                        <li class="page-scroll">
-                            <a href="#about">Phones</a>
-                        </li>
-                        <li class="page-scroll">
-                            <a href="#contact">News</a>
-                        </li>
-                        <li class="page-scroll">
-                            <?php if (isset($_SESSION['userdata'])) { ?>
-                                <a href="?logout" >Logout <i class="glyphicon glyphicon-log-out"></i></a>
-                            <?php } else { ?>
-                                <a href="Login.php" >Sign in <i class="glyphicon glyphicon-log-in"></i></a>
-                            <?php } ?>
-                        </li>
-                    </ul>
-                </div>
-            </div>
 
-        </nav>
         <div class="parallax">
+            <nav id="mainNav" style="border-radius:0px;margin-bottom: 50px;" class="navbar navbar-default  navbar-custom affix-top">
+                <div class="container">
+                    <!-- Brand and toggle get grouped for better mobile display -->
+                    <div class="navbar-header page-scroll">
+                        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                            <span class="sr-only">Toggle navigation</span><i class="glyphicon glyphicon-menu-down"></i>
+                        </button>
+                        <a class="navbar-brand" href="index.php" style="padding: 0px;"><h1 class="cusname" style="margin: 5px;color: white">Help</h1></a>
+                    </div>
+                    <!-- Collect the nav links, forms, and other content for toggling -->
+                    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                        <ul class="nav navbar-nav navbar-right">
+                            <li class="hidden active">
+                                <a href="#page-top"></a>
+                            </li>
+                            <li class="page-scroll">
+                                <a href="#about">Phones</a>
+                            </li>
+                            <li class="page-scroll">
+                                <a href="#contact">News</a>
+                            </li>
+                            <li class="page-scroll">
+                                <?php if (isset($_SESSION['userdata'])) { ?>
+                                    <a href="?logout" >Logout <i class="glyphicon glyphicon-log-out"></i></a>
+                                <?php } else { ?>
+                                    <a href="Login.php" >Sign in <i class="glyphicon glyphicon-log-in"></i></a>
+                                <?php } ?>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+            </nav>
             <div class="row"  >
                 <div class="container">
                     <?php if (isset($_SESSION['userdata'])) { ?>
                         <div class="col-md-4" ng-controller="userinfo">
-                            <!--                            <div class="well" style="">
-                                                            <div class="row" >
-                                                                <div class="col-xs-3">
-                                                                    <img ng-src="<?php echo $hostname; ?>{{Upic}}" style="" class="img-circle img-responsive img-rounded img-thumbnail" height="25">
-                                                                </div> 
-                                                                <div class="col-xs-9" style="padding-left:0px">
-                                                                    Name : {{Uname}}</br>
-                                                                    Birth Date : {{Ubdate}}</br>
-                                                                    Gender : {{Ugen}}</br>
-                                                                </div>
-                                                            </div>
-                                                        </div>-->
                             <figure class="snip1336">
-                                <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/331810/sample87.jpg" alt="sample87" />
+                                <img ng-src="<?php echo $hostname; ?>{{User.Upic}}" alt="sample87" />
                                 <figcaption>
-                                    <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/331810/profile-sample4.jpg" alt="profile-sample4" class="profile" />
-                                    <h2>Hans Down<span>Engineer</span></h2>
-                                    <p>I'm looking for something that can deliver a 50-pound payload of snow on a small feminine target. Can you suggest something? Hello...? </p>
+                                    <img ng-src="<?php echo $hostname; ?>{{User.Upic}}" width="64" alt="profile-sample4" class="profile" />
+                                    <h2>{{User.Uname}}<span>{{User.Jname}}</span></h2>
+                                    <p>{{User.Udiscription}}</p>
                                     <a href="#" class="follow">Follow</a>
                                     <a href="#" class="info">More Info</a>
                                 </figcaption>
@@ -276,11 +261,17 @@ if (isset($_GET['logout'])) {
                     <div class="col-md-<?php echo isset($_SESSION['userdata']) ? "8" : "12" ?>">
                         <div class="alert alert-danger" id="error"></div>
                         <div class="well" style="">
-
+                            dfsdf
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
+        <div class="" style="height: 200px;background: white">
+
+        </div>
+        <div class="parallax1">
+
         </div>
     </body>    
 </html>

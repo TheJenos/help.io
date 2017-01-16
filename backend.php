@@ -19,14 +19,9 @@ function fail($msg) {
 
 function userinfo() {
     $user = array();
-    $data = SearchARow("user", array('*'), "Uemail='" . antisqli($_SESSION['userdata']['Uemail']) . "' ");
-    $user['Uname'] = $data['Uname'];
-    $user['UID'] = $data['UID'];
+    $data = SearchARow("`user` NATURAL JOIN `jobs`", array('*'), "Uemail='" . antisqli($_SESSION['userdata']['Uemail']) . "' ");
+    $user = $data;
     $user['Upass'] = myencyption($data['Upass']);
-    $user['Uemail'] = $data['Uemail'];
-    $user['Ugen'] = $data['Ugen'];
-    $user['Ubdate'] = $data['Ubdate'];
-    $user['Upic'] = $data['Upic'];
     $GLOBALS['json']['user'] = $user;
 }
 
@@ -55,8 +50,9 @@ if (isset($_POST['json'])) {
 
 //====================DerectLoging===========================================//
 if (isset($_POST['username'])) {
-    $data = SearchARow("user", array('*'), " Uemail='" . antisqli($_POST['username']) . "' ");
+    $data = SearchARow("`user` NATURAL JOIN `jobs`", array('*'), " Uemail='" . antisqli($_POST['username']) . "' ");
     if (!isset($data)) {
+        logit(mysqli_error($con));
         header("Location: Login.php");
     }
     if ($_POST['pass'] == $data['Upass']) {
