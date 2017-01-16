@@ -3,7 +3,7 @@
 include './config.php';
 CookieLogin();
 if (isset($_SESSION['userdata'])) {
-    header("Location: Index.php");
+    header("Location: index.php");
 }
 ?>
 <html>

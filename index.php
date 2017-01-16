@@ -6,7 +6,7 @@ if (isset($_GET['logout'])) {
     session_destroy();
     setcookie('username', '', 0, "/");
     setcookie('userpass', '', 0, "/");
-    header("Location: Index.php");
+    header("Location: index.php");
 }
 ?>
 <html>

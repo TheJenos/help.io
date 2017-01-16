@@ -67,7 +67,7 @@ if (isset($_POST['username'])) {
             setcookie('username', $_SESSION['userdata']['Uemail'], time() + 60 * 60 * 24 * 14, "/");
             setcookie('userpass', $_SESSION['userdata']['Upass'], time() + 60 * 60 * 24 * 14, "/");
         }
-        header("Location: Index.php");
+        header("Location: index.php");
     }
 }
 
