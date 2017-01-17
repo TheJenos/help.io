@@ -56,26 +56,43 @@ if (isset($_GET['logout'])) {
                 /*box-shadow: 0px 0px 5px black;*/
                 border-radius: 0px;
             }
-            .parallax {
-                /*padding-top: 50px;*/
-            }
             .navbar-custom{
-                /*background: linear-gradient(#141414, rgba(20, 20, 20, 0.51));*/
                 background: #141414;
+            }
+            .footer .footer-above{
+                background: #141414;
+            }
+            .footer h1,.footer h2,.footer h3,.footer h4{
+                color:white;
+            }
+            .footer .footer-below{
+                background: #0e0e0e;
             }
             .parallax1 {
                 background-image: url("images/18-comments-a-helping-hand-ETv8U8-clipart.jpg");
                 /*height: 760px;*/ 
-                padding-bottom: 100px;
+                padding: 20%;
                 background-attachment: fixed;
                 background-position: center;
                 background-repeat: no-repeat;
                 background-size: cover;
+                text-align: center;
 
+            }
+            .parallax1 h3{
+                background-color: #141414;
+                padding: 20px;
+                width: fit-content;
+                color:white;
+            }
+            .box-h3{
+                background-color: #141414;
+                padding: 20px;
+                width: fit-content;
+                color:white;
             }
             .parallax {
                 background-image: url("images/desktop-pozadia-themes-tapety-wallpaper-pictures-creative.jpg");
-                /*height: 760px;*/ 
                 padding-bottom: 100px;
                 background-attachment: fixed;
                 background-position: center;
@@ -125,7 +142,7 @@ if (isset($_GET['logout'])) {
                 border: 1px solid #ffffff;
                 color: #ffffff;
                 font-size: 0.7em;
-                text-transform: uppercase;
+                text-transform: uppercase !important;
                 margin: 10px 0;
                 display: inline-block;
                 opacity: 0.65;
@@ -133,7 +150,7 @@ if (isset($_GET['logout'])) {
                 text-align: center;
                 text-decoration: none;
                 font-weight: 600;
-                letter-spacing: 1px;
+                letter-spacing: 5px;
             }
             .snip1336 figcaption a:hover {
                 opacity: 1;
@@ -171,22 +188,22 @@ if (isset($_GET['logout'])) {
             .page-scroll a{
                 font: 14px "Lato", sans-serif;
             }
-            
+
             h1 {
                 letter-spacing: 5px;
-                text-transform: uppercase;
+                text-transform: none !important;
                 font: 40px "Lato", sans-serif;
                 color: #ffffff;
             }
             h2 {
                 letter-spacing: 5px;
-                text-transform: uppercase;
+                text-transform: none !important;
                 font: 25px "Lato", sans-serif;
                 color: #ffffff;
             }
             h3 {
                 letter-spacing: 5px;
-                text-transform: uppercase;
+                text-transform: none !important;
                 font: 20px "Lato", sans-serif;
                 color: #111;
             }
@@ -235,7 +252,7 @@ if (isset($_GET['logout'])) {
                         <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
                             <span class="sr-only">Toggle navigation</span><i class="glyphicon glyphicon-menu-down"></i>
                         </button>
-                        <a class="navbar-brand" href="index.php" style="padding: 0px;"><h1 class="cusname" style="margin: 5px;color: white">Help</h1></a>
+                        <a class="navbar-brand" href="index.php" style="padding: 5px;height: auto;"><h1 class="cusname" style="margin: 5px;color: white">HELP</h1></a>
                     </div>
                     <!-- Collect the nav links, forms, and other content for toggling -->
                     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
@@ -288,11 +305,61 @@ if (isset($_GET['logout'])) {
             </div>
         </div>
         <div style="color: #777;background-color:white;text-align:center;padding:50px 80px;text-align: justify;">
-            <h3 style="text-align:center;">Parallax Demo</h3>
-            <p>Parallax scrolling is a web site trend where the background content is moved at a different speed than the foreground content while scrolling. Nascetur per nec posuere turpis, lectus nec libero turpis nunc at, sed posuere mollis ullamcorper libero ante lectus, blandit pellentesque a, magna turpis est sapien duis blandit dignissim. Viverra interdum mi magna mi, morbi sociis. Condimentum dui ipsum consequat morbi, curabitur aliquam pede, nullam vitae eu placerat eget et vehicula. Varius quisque non molestie dolor, nunc nisl dapibus vestibulum at, sodales tincidunt mauris ullamcorper, dapibus pulvinar, in in neque risus odio. Accumsan fringilla vulputate at quibusdam sociis eleifend, aenean maecenas vulputate, non id vehicula lorem mattis, ratione interdum sociis ornare. Suscipit proin magna cras vel, non sit platea sit, maecenas ante augue etiam maecenas, porta porttitor placerat leo.</p>
+            <center>
+                <h3 style="text-align:center;" class="box-h3">Parallax Demo</h3>
+                <p>Parallax scrolling is a web site trend where the background content is moved at a different speed than the foreground content while scrolling. Nascetur per nec posuere turpis, lectus nec libero turpis nunc at, sed posuere mollis ullamcorper libero ante lectus, blandit pellentesque a, magna turpis est sapien duis blandit dignissim. Viverra interdum mi magna mi, morbi sociis. Condimentum dui ipsum consequat morbi, curabitur aliquam pede, nullam vitae eu placerat eget et vehicula. Varius quisque non molestie dolor, nunc nisl dapibus vestibulum at, sodales tincidunt mauris ullamcorper, dapibus pulvinar, in in neque risus odio. Accumsan fringilla vulputate at quibusdam sociis eleifend, aenean maecenas vulputate, non id vehicula lorem mattis, ratione interdum sociis ornare. Suscipit proin magna cras vel, non sit platea sit, maecenas ante augue etiam maecenas, porta porttitor placerat leo.</p>
+            </center>
         </div>
         <div class="parallax1">
-
+            <center>
+                <h3 style="text-align:center;">Parallax Demo</h3>
+            </center>
         </div>
+        <footer class="footer text-center fix">
+            <div class="footer-above">
+                <div class="container">
+                    <div class="row">
+                        <div class="footer-col col-md-4">
+                            <h3>Location</h3>
+                            <p>99A,Kirulapana Av
+                                <br>Colombo 05</p>
+                        </div>
+                        <div class="footer-col col-md-4">
+                            <h3>Around the Web</h3>
+                            <ul class="list-inline">
+                                <li>
+                                    <a href="#" class="btn-social btn-outline"><i class="fa fa-fw fa-facebook"></i></a>
+                                </li>
+                                <li>
+                                    <a href="#" class="btn-social btn-outline"><i class="fa fa-fw fa-google-plus"></i></a>
+                                </li>
+                                <li>
+                                    <a href="#" class="btn-social btn-outline"><i class="fa fa-fw fa-twitter"></i></a>
+                                </li>
+                                <li>
+                                    <a href="#" class="btn-social btn-outline"><i class="fa fa-fw fa-linkedin"></i></a>
+                                </li>
+                                <li>
+                                    <a href="#" class="btn-social btn-outline"><i class="fa fa-fw fa-dribbble"></i></a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="footer-col col-md-4">
+                            <h3>About Developer</h3>
+                            <p>Created By Thanura Nadun Ranasinghe.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-below">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            Copyright © Help.IO 2016
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
     </body>    
 </html>

@@ -12,7 +12,7 @@
         border: 1px solid #ffffff;
         color: #ffffff;
         font-size: 0.7em;
-        text-transform: uppercase;
+        text-transform: none !important;
         margin: 10px 0;
         display: inline-block;
         opacity: 0.65;
@@ -48,27 +48,34 @@
     }
     h1 {
         letter-spacing: 5px;
-        text-transform: uppercase;
+        text-transform: none !important;
         font: 40px "Lato", sans-serif;
         color: #ffffff;
     }
     h2 {
         letter-spacing: 5px;
-        text-transform: uppercase;
+        text-transform: none !important;
         font: 25px "Lato", sans-serif;
         color: #ffffff;
     }
     h3 {
         letter-spacing: 5px;
-        text-transform: uppercase;
+        text-transform: none !important;
         font: 20px "Lato", sans-serif;
         color: #111;
     }
     label {
         letter-spacing: 5px;
-        text-transform: uppercase;
+        text-transform: none !important;
         font: 10px "Lato", sans-serif;
         color: white;
+    }
+    a{
+        letter-spacing: 3px;
+        text-transform: uppercase !important;
+    }
+    .navbar-custom, header .intro-text .name {
+        text-transform: none !important;
     }
 </style>
 
