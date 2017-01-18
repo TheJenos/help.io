@@ -54,7 +54,7 @@ if (isset($_SESSION['userdata'])) {
         </script>
         <style>
             body{
-                background: url('images/18-comments-a-helping-hand-ETv8U8-clipart.jpg');
+                background: url('images/bg/<?php echo randImages(); ?>');
                 background-size: 1366px;
             }
             

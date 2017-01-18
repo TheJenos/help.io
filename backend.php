@@ -24,7 +24,10 @@ function userinfo() {
     $user['Upass'] = myencyption($data['Upass']);
     $GLOBALS['json']['user'] = $user;
 }
-
+function transinfo(){
+    
+    $GLOBALS['json']['Wallet']="200";
+}
 //=====================RUN=====================//
 if (isset($_POST['json'])) {
     if (!isset($_POST['uname'])) {
@@ -39,8 +42,8 @@ if (isset($_POST['json'])) {
     }
     if ($data['Upass'] == $_POST['upass'] || myencyption($data['Upass']) == $_POST['upass']) {
         $json['status'] = "Success";
-        if (isset($_POST['userinfo'])) {
-            userinfo();
+        if (isset($_POST['want'])) {
+            call_user_func($_POST['want']);
         }
         exitWithPrint();
     } else {

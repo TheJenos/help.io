@@ -45,10 +45,6 @@ if (isset($_GET['logout'])) {
                 -webkit-animation: blink-animation 1s infinite;
                 animation-direction: alternate;
             }
-            .well:hover{
-                -webkit-animation: 0.5s draw linear forwards;
-                animation: 0.5s draw linear forwards
-            }
             .well{
                 color: white;
                 border: 0px; 
@@ -69,7 +65,8 @@ if (isset($_GET['logout'])) {
                 background: #0e0e0e;
             }
             .parallax1 {
-                background-image: url("images/18-comments-a-helping-hand-ETv8U8-clipart.jpg");
+                content: "";
+                background-image: url("images/bg/<?php echo randImages(); ?>");
                 /*height: 760px;*/ 
                 padding: 20%;
                 background-attachment: fixed;
@@ -79,12 +76,6 @@ if (isset($_GET['logout'])) {
                 text-align: center;
 
             }
-            .parallax1 h3{
-                background-color: #141414;
-                padding: 20px;
-                width: fit-content;
-                color:white;
-            }
             .box-h3{
                 background-color: #141414;
                 padding: 20px;
@@ -92,7 +83,7 @@ if (isset($_GET['logout'])) {
                 color:white;
             }
             .parallax {
-                background-image: url("images/desktop-pozadia-themes-tapety-wallpaper-pictures-creative.jpg");
+                background-image: url("images/bg/<?php echo randImages(); ?>");
                 padding-bottom: 100px;
                 background-attachment: fixed;
                 background-position: center;
@@ -207,6 +198,12 @@ if (isset($_GET['logout'])) {
                 font: 20px "Lato", sans-serif;
                 color: #111;
             }
+            .defs-only {
+                position: absolute;
+                height: 0; width: 0;
+                overflow: none;
+                left: -100%;
+            }
         </style>
         <script type="text/javascript">
             var app = angular.module("home", []);
@@ -228,7 +225,7 @@ if (isset($_GET['logout'])) {
                         $.post("backend.php", {
                             "uname": "<?php echo $_SESSION['userdata']['Uemail']; ?>",
                             "upass": "<?php echo $_SESSION['userdata']['Upass']; ?>",
-                            "userinfo": true,
+                            "want": "userinfo",
                             "json": true
                         }).done(function(response) {
                             var result = $.parseJSON(response);
@@ -239,11 +236,26 @@ if (isset($_GET['logout'])) {
                         });
                     }, 5000);
                 });
+                app.controller("trans", function($scope, $interval) {
+                    $interval(function() {
+                        $.post("backend.php", {
+                            "uname": "<?php echo $_SESSION['userdata']['Uemail']; ?>",
+                            "upass": "<?php echo $_SESSION['userdata']['Upass']; ?>",
+                            "want": "transinfo",
+                            "json": true
+                        }).done(function(response) {
+                            var result = $.parseJSON(response);
+                            if (result.status == "Fail") {
+                                showError(result.msg);
+                            }
+                            $scope.result = result;
+                        });
+                    }, 1000);
+                });
 <?php } ?>
         </script>
     </head>
     <body ng-app="home" >
-
         <div class="parallax">
             <nav id="mainNav" style="border-radius:0px;margin-bottom: 50px;" class="navbar navbar-default  navbar-custom affix-top">
                 <div class="container">
@@ -268,6 +280,9 @@ if (isset($_GET['logout'])) {
                             </li>
                             <li class="page-scroll">
                                 <?php if (isset($_SESSION['userdata'])) { ?>
+                                    <a href="?profile" >Profile <i class="fa fa-user-circle-o" aria-hidden="true"></i></a>
+                                </li>
+                                <li class="page-scroll">  
                                     <a href="?logout" >Logout <i class="glyphicon glyphicon-log-out"></i></a>
                                 <?php } else { ?>
                                     <a href="Login.php" >Sign in <i class="glyphicon glyphicon-log-in"></i></a>
@@ -278,49 +293,166 @@ if (isset($_GET['logout'])) {
                 </div>
 
             </nav>
-            <div class="row"  >
-                <div class="container">
-                    <?php if (isset($_SESSION['userdata'])) { ?>
+            <?php if (isset($_SESSION['userdata']) && isset($_GET['profile'])) { ?>
+                <div class="row"  >
+                    <div class="container">
+                        <?php if (isset($_SESSION['userdata'])) { ?>
+                            <div class="col-md-4" ng-controller="userinfo">
+                                <figure class="snip1336">
+                                    <img ng-src="<?php echo $hostname; ?>{{User.Ubgimage}}" alt="sample87" />
+                                    <figcaption>
+                                        <img ng-src="<?php echo $hostname; ?>{{User.Upic}}" width="64" alt="profile-sample4" class="profile" />
+                                        <h2>{{User.Uname}}<span>{{User.Jname}}</span></h2>
+                                        <p>{{User.Udiscription}}</p>
+                                        <a href="#" style="width:100%" class="">Edit Profile</a>
+                                    </figcaption>
+                                </figure>
+
+                            </div>
+                        <?php } ?>
+                        <div class="col-md-8" ng-controller="trans">
+                            <div class="alert alert-danger" id="error"></div>
+                            <div class="well" style="">
+                                <div style="display: inline-block;width: 100%;">
+                                    <h4 class="float-left">My Wallet : ${{result.Wallet}}</h4>
+                                    <h4 class="float-right">Transections Count : {{result.count}}</h4> 
+                                    
+                                </div>
+                                <hr>
+                                <h3 style="margin-top:20px;margin-bottom: 10px;color:#2980b9">My Transections</h3>
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Firstname</th>
+                                            <th>Lastname</th>
+                                            <th>Email</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>John</td>
+                                            <td>Doe</td>
+                                            <td>john@example.com</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Mary</td>
+                                            <td>Moe</td>
+                                            <td>mary@example.com</td>
+                                        </tr>
+                                        <tr>
+                                            <td>July</td>
+                                            <td>Dooley</td>
+                                            <td>july@example.com</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <?php } else { ?>
+                <center>
+                    <h3 class="box-h3" style="padding:20px;margin: 20%">“He has a right to criticize, who has a heart to help.” <br>
+                        ― Abraham Lincoln</h3>
+
+                </center>
+            </div>
+            <div style="color: #777;background-color:white;text-align:center;padding:50px 80px;text-align: justify;">
+                <p>
+                    Volunteering your time, money, or energy to help others doesn’t just make the world better—it also makes you better. Studies indicate that the very act of giving back to the community boosts your happiness, health, and sense of well-being. Here are seven scientific benefits of lending a hand to those in need. 
+                </p>
+                <h3 style="text-align:center;" class="box-h3">
+                    1. HELPING OTHERS CAN HELP YOU LIVE LONGER. 
+                </h3>
+                <p>
+                    Want to extend your lifespan? Think about regularly assisting at a soup kitchen or coaching a basketball team at an at-risk high school. Research has shown that these kinds of activities can improve health in ways that can length your lifespan—volunteers show an improved ability to manage stress and stave off disease as well as reduced rates of depression and an increased sense of life satisfaction—when they were performed on a regular basis. This might be because volunteering alleviates loneliness and enhances our social lives—factors that can significantly affect our long-term health.  
+                </p>
+                <h3 style="text-align:center;" class="box-h3">
+                    2. ALTRUISM IS CONTAGIOUS. 
+                </h3>
+                <p>
+                    When one person performs a good deed, it causes a chain reaction of other altruistic acts. One study found that people are more likely to perform feats of generosity after observing another do the same. This effect can ripple throughout the community, inspiring dozens of individuals to make a difference.  
+                </p>
+                <h3 style="text-align:center;" class="box-h3">
+                    3. HELPING OTHERS MAKES US HAPPY. 
+                </h3>
+                <p>
+                    One team of sociologists tracked 2000 people over a five-year period and found that Americans who described themselves as “very happy” volunteered at least 5.8 hours per month. This heightened sense of well-being might be the byproduct of being more physically active as a result of volunteering, or because it makes us more socially active. Researchers also think that giving back might give individuals a mental boost by providing them with a neurochemical sense of reward. 
+                </p>
+                <h3 style="text-align:center;" class="box-h3">
+                    4. HELPING OTHERS MAY HELP WITH CHRONIC PAIN. 
+                </h3>
+                <p>
+                    According to one study, people who suffered from chronic pain tried working as peer volunteers. As a result, they experienced a reduction in their own symptoms. 
+                </p>
+                <h3 style="text-align:center;" class="box-h3">
+                    5. HELPING OTHERS LOWERS BLOOD PRESSURE. 
+                </h3>
+                <p>
+                    If you’re at risk for heart problems, your doctor has probably told you to cut back on red meat or the hours at your stressful job. However, you should also consider adding something to your routine: a regular volunteer schedule. One piece of research showed that older individuals who volunteered for at least 200 hours a year decreased their risk of hypertension by a whopping 40 percent. This could possibly be because they were provided with more social opportunities, which help relieve loneliness and the stress that often accompanies it.  
+                </p>
+                <h3 style="text-align:center;" class="box-h3">
+                    6. HELPING OTHERS PROMOTES POSITIVE BEHAVIORS IN TEENS. 
+                </h3>
+                <p>
+                    According to sociologists, teenagers who volunteer have better grades and self-image. 
+                </p>
+                <h3 style="text-align:center;" class="box-h3">
+                    7. HELPING OTHERS GIVES US A SENSE OF PURPOSE AND SATISFACTION. 
+                </h3>
+                <p>
+                    Looking for more meaning in your day-to-day existence? Studies show that volunteering enhances an individual’s overall sense of purpose and identity—particularly if they no longer hold a life-defining role like “worker” or “parent.” 
+                </p>
+            </div>
+            <div class="parallax1" style="padding: 5%">
+                <center>
+                    <h3 style="text-align:center;margin-bottom: 40px" class="box-h3">
+                        Top 3 Helpers
+                    </h3>
+                    <div class="row">
                         <div class="col-md-4" ng-controller="userinfo">
                             <figure class="snip1336">
                                 <img ng-src="<?php echo $hostname; ?>{{User.Ubgimage}}" alt="sample87" />
                                 <figcaption>
                                     <img ng-src="<?php echo $hostname; ?>{{User.Upic}}" width="64" alt="profile-sample4" class="profile" />
-                                    <h2>{{User.Uname}}<span>{{User.Jname}}</span></h2>
+                                    <h2>{{User.Uname}}({{User.Urate}})<span>{{User.Jname}}</span></h2>
                                     <p>{{User.Udiscription}}</p>
-                                    <a href="#" style="width:100%" class="">Edit Profile</a>
                                 </figcaption>
                             </figure>
 
                         </div>
-                    <?php } ?>
-                    <div class="col-md-<?php echo isset($_SESSION['userdata']) ? "8" : "12" ?>">
-                        <div class="alert alert-danger" id="error"></div>
-                        <div class="well" style="">
-                            dfsdf
-                            <hr>
+                        <div class="col-md-4" ng-controller="userinfo">
+                            <figure class="snip1336">
+                                <img ng-src="<?php echo $hostname; ?>{{User.Ubgimage}}" alt="sample87" />
+                                <figcaption>
+                                    <img ng-src="<?php echo $hostname; ?>{{User.Upic}}" width="64" alt="profile-sample4" class="profile" />
+                                    <h2>{{User.Uname}}({{User.Urate}})<span>{{User.Jname}}</span></h2>
+                                    <p>{{User.Udiscription}}</p>
+                                </figcaption>
+                            </figure>
+
+                        </div>
+                        <div class="col-md-4" ng-controller="userinfo">
+                            <figure class="snip1336">
+                                <img ng-src="<?php echo $hostname; ?>{{User.Ubgimage}}" alt="sample87" />
+                                <figcaption>
+                                    <img ng-src="<?php echo $hostname; ?>{{User.Upic}}" width="64" alt="profile-sample4" class="profile" />
+                                    <h2>{{User.Uname}}({{User.Urate}})<span>{{User.Jname}}</span></h2>
+                                    <p>{{User.Udiscription}}</p>
+                                </figcaption>
+                            </figure>
+
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-        <div style="color: #777;background-color:white;text-align:center;padding:50px 80px;text-align: justify;">
-            <center>
-                <h3 style="text-align:center;" class="box-h3">Parallax Demo</h3>
-                <p>Parallax scrolling is a web site trend where the background content is moved at a different speed than the foreground content while scrolling. Nascetur per nec posuere turpis, lectus nec libero turpis nunc at, sed posuere mollis ullamcorper libero ante lectus, blandit pellentesque a, magna turpis est sapien duis blandit dignissim. Viverra interdum mi magna mi, morbi sociis. Condimentum dui ipsum consequat morbi, curabitur aliquam pede, nullam vitae eu placerat eget et vehicula. Varius quisque non molestie dolor, nunc nisl dapibus vestibulum at, sodales tincidunt mauris ullamcorper, dapibus pulvinar, in in neque risus odio. Accumsan fringilla vulputate at quibusdam sociis eleifend, aenean maecenas vulputate, non id vehicula lorem mattis, ratione interdum sociis ornare. Suscipit proin magna cras vel, non sit platea sit, maecenas ante augue etiam maecenas, porta porttitor placerat leo.</p>
-            </center>
-        </div>
-        <div class="parallax1">
-            <center>
-                <h3 style="text-align:center;">Parallax Demo</h3>
-            </center>
+                </center>
+            <?php } ?>
         </div>
         <footer class="footer text-center fix">
             <div class="footer-above">
                 <div class="container">
                     <div class="row">
                         <div class="footer-col col-md-4">
-                            <h3>Location</h3>
+                            <h3>Location(HeadOffice)</h3>
                             <p>99A,Kirulapana Av
                                 <br>Colombo 05</p>
                         </div>
@@ -355,7 +487,7 @@ if (isset($_GET['logout'])) {
                 <div class="container">
                     <div class="row">
                         <div class="col-lg-12">
-                            Copyright © Help.IO 2016
+                            Copyright © Help.IO 2017
                         </div>
                     </div>
                 </div>

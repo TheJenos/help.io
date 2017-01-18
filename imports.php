@@ -6,6 +6,7 @@
 <link rel="stylesheet" type="text/css" href="css/freelancer.min.css">
 <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
 <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css">
+<link href="http://fontawesome.io/assets/font-awesome/css/font-awesome.css" rel="stylesheet" type="text/css">
 <style>
     .simple{
         padding: 5px;
@@ -76,6 +77,19 @@
     }
     .navbar-custom, header .intro-text .name {
         text-transform: none !important;
+    }
+    .well h1,.well h2,.well h3,.well h4{
+        color: white;
+        margin: 0px;
+
+    }
+    .float-left{
+        float:left;
+        margin-right: 40px !important;
+    }
+    .float-right{
+        float:right;
+        margin-left: 40px !important;
     }
 </style>
 

@@ -13,6 +13,16 @@ if (!$con) {
 }
 error_reporting(E_ALL ^ E_WARNING);
 session_start();
+$bgimages = array();
+if ($handle = opendir('images/bg/')) {
+    while (false !== ($entry = readdir($handle))) {
+        if ($entry != "." && $entry != "..") {
+            array_push($bgimages, $entry);
+        }
+    }
+    closedir($handle);
+}
+
 //======================funtions===============================//
 function logit($param) {
     $newtxt = file_get_contents($GLOBALS['logfile']) . "\n" . $param;
@@ -31,6 +41,16 @@ function myencyption($txt) {
     return crypt($txt, '$1$rasmusle$');
 }
 
+function randImages() {
+    if(count($GLOBALS['bgimages'])>0) {
+        $randval = rand(0, count($GLOBALS['bgimages']) - 1);
+        $val = $GLOBALS['bgimages'][$randval];
+        array_splice($GLOBALS['bgimages'], $randval, 1);
+        return $val;
+    } else {
+        return FALSE;
+    }
+}
 
 //=============================validations==========================//
 function validateNIC($nic) {
@@ -191,4 +211,3 @@ function SearchToTable($table, $rows, $where, $id, $removebtn, $updatebtn) {
     logit($query);
     echo $tr;
 }
-
