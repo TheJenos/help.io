@@ -214,6 +214,14 @@ if (isset($_GET['logout'])) {
                     $('#error').fadeOut('fast');
                 }, 2000);
             }
+            function sum(a, b) {
+                if(typeof(a.Tamount) == "undefined"){
+                    return b.Tamount; 
+                }if(typeof(b.Tamount) == "undefined"){
+                    return a.Tamount; 
+                }
+                return a.Tamount + b.Tamount; 
+            }
             $(function() {
                 $('#error').hide();
             });
@@ -248,6 +256,12 @@ if (isset($_GET['logout'])) {
                             if (result.status == "Fail") {
                                 showError(result.msg);
                             }
+                            
+                            var fromsum = result.Tfrom.reduce(sum, 0);
+                            var tosum = result.Tto.reduce(sum, 0);
+                            result.Wallet = tosum-fromsum;
+                            result.trans = result.Tfrom.concat(result.Tto);
+                            result.Count = result.Tfrom.length+result.Tto.length;
                             $scope.result = result;
                         });
                     }, 1000);
@@ -261,7 +275,7 @@ if (isset($_GET['logout'])) {
                 <div class="container">
                     <!-- Brand and toggle get grouped for better mobile display -->
                     <div class="navbar-header page-scroll">
-                        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                        <button style="margin-top: 15px;" type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
                             <span class="sr-only">Toggle navigation</span><i class="glyphicon glyphicon-menu-down"></i>
                         </button>
                         <a class="navbar-brand" href="index.php" style="padding: 5px;height: auto;"><h1 class="cusname" style="margin: 5px;color: white">HELP</h1></a>
@@ -315,34 +329,29 @@ if (isset($_GET['logout'])) {
                             <div class="well" style="">
                                 <div style="display: inline-block;width: 100%;">
                                     <h4 class="float-left">My Wallet : ${{result.Wallet}}</h4>
-                                    <h4 class="float-right">Transections Count : {{result.count}}</h4> 
-                                    
+                                    <h4 class="float-right">Transections Count : {{result.Count}}</h4> 
                                 </div>
                                 <hr>
                                 <h3 style="margin-top:20px;margin-bottom: 10px;color:#2980b9">My Transections</h3>
-                                <table class="table">
+                                <table class="table table-responsive table-hover">
                                     <thead>
                                         <tr>
-                                            <th>Firstname</th>
-                                            <th>Lastname</th>
-                                            <th>Email</th>
+                                            <th>Transections ID</th>
+                                            <th>Type</th>
+                                            <th>User</th>
+                                            <th>Transections Amount</th>
+                                            <th>Transections Date</th>
+                                            <th>Transections Time</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td>John</td>
-                                            <td>Doe</td>
-                                            <td>john@example.com</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Mary</td>
-                                            <td>Moe</td>
-                                            <td>mary@example.com</td>
-                                        </tr>
-                                        <tr>
-                                            <td>July</td>
-                                            <td>Dooley</td>
-                                            <td>july@example.com</td>
+                                        <tr ng-repeat="x in result.trans | orderBy : '-Tdatetime'" >
+                                            <td>{{x.TID}}</td>
+                                            <td>{{x.Ttype}}</td>
+                                            <td>{{x.Uname}}</td>
+                                            <td>${{x.Tamount}}</td>
+                                            <td>{{x.Tdatetime.split(" ")[0]}}</td>
+                                            <td>{{x.Tdatetime.split(" ")[1]}}</td>
                                         </tr>
                                     </tbody>
                                 </table>

@@ -2,6 +2,7 @@
 
 include './config.php';
 $json = array();
+$myprofile;
 
 //====================Funtion==================//
 function exitWithPrint() {
@@ -25,8 +26,10 @@ function userinfo() {
     $GLOBALS['json']['user'] = $user;
 }
 function transinfo(){
-    
-    $GLOBALS['json']['Wallet']="200";
+    $from = SearchARows("`transaction` JOIN `user` ON `transaction`.`Tto`=`user`.`UID` ", array('TID','Tamount','Tto','Uname','Tdatetime',"'Outcome' as `Ttype`"), "Tfrom='".antisqli($GLOBALS['myprofile']['UID'])."'");
+    $to = SearchARows("`transaction` JOIN `user` ON `transaction`.`Tfrom`=`user`.`UID` ", array('TID','Tamount','Tfrom','Uname','Tdatetime',"'Income' as `Ttype`"), "Tto='".antisqli($GLOBALS['myprofile']['UID'])."'");
+    $GLOBALS['json']['Tfrom']=$from;
+    $GLOBALS['json']['Tto']=$to;
 }
 //=====================RUN=====================//
 if (isset($_POST['json'])) {
@@ -36,13 +39,14 @@ if (isset($_POST['json'])) {
     if (!isset($_POST['upass'])) {
         fail("Password Missing");
     }
-    $data = SearchARow("user", array('UID', 'Uname', 'Upass'), "Uemail='" . antisqli($_POST['uname']) . "' ");
+    $data = SearchARow("user", array('*'), "Uemail='" . antisqli($_POST['uname']) . "' ");
     if (!isset($data)) {
         fail("Invalid Username");
     }
     if ($data['Upass'] == $_POST['upass'] || myencyption($data['Upass']) == $_POST['upass']) {
         $json['status'] = "Success";
         if (isset($_POST['want'])) {
+            $myprofile = $data;
             call_user_func($_POST['want']);
         }
         exitWithPrint();

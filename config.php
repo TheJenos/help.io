@@ -151,6 +151,21 @@ function SearchARow($table, $rows, $where) {
         return mysqli_fetch_assoc($result);
     }
 }
+function SearchARows($table, $rows, $where) {
+    $con = $GLOBALS['con'];
+    $cols = "";
+    foreach ($rows as $key => $value) {
+        $cols .= "$value,";
+    }
+    $cols = substr($cols, 0, strlen($cols) - 1);
+    $query = "SELECT " . $cols . " FROM $table WHERE $where";
+    $result = mysqli_query($con, $query);
+    $datalines = array();
+    while ($row = mysqli_fetch_assoc($result)) {
+        array_push($datalines, $row);
+    }
+    return $datalines;
+}
 
 function SearchToItems($table, $rows, $where, $pattern, $id) {
     $con = $GLOBALS['con'];

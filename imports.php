@@ -91,5 +91,9 @@
         float:right;
         margin-left: 40px !important;
     }
+    .table-hover tbody tr:hover{
+        color: #141414;
+    }
 </style>
+
 
