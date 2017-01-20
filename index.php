@@ -7,6 +7,10 @@ if (isset($_GET['logout'])) {
     setcookie('username', '', 0, "/");
     setcookie('userpass', '', 0, "/");
     header("Location: index.php");
+} else if (isset($_GET['status'])) {
+    $data = array('Ustatus' => $_GET['status']);
+    Update("`user`", $data, "UID='" . antisqli($_SESSION['userdata']['UID']) . "'");
+    header("Location: index.php?profile");
 }
 ?>
 <html>
@@ -215,12 +219,13 @@ if (isset($_GET['logout'])) {
                 }, 2000);
             }
             function sum(a, b) {
-                if(typeof(a.Tamount) == "undefined"){
-                    return b.Tamount; 
-                }if(typeof(b.Tamount) == "undefined"){
-                    return a.Tamount; 
+                if (typeof (a.Tamount) == "undefined") {
+                    return b.Tamount;
                 }
-                return a.Tamount + b.Tamount; 
+                if (typeof (b.Tamount) == "undefined") {
+                    return a.Tamount;
+                }
+                return a.Tamount + b.Tamount;
             }
             $(function() {
                 $('#error').hide();
@@ -256,12 +261,12 @@ if (isset($_GET['logout'])) {
                             if (result.status == "Fail") {
                                 showError(result.msg);
                             }
-                            
+
                             var fromsum = result.Tfrom.reduce(sum, 0);
                             var tosum = result.Tto.reduce(sum, 0);
-                            result.Wallet = tosum-fromsum;
+                            result.Wallet = tosum - fromsum;
                             result.trans = result.Tfrom.concat(result.Tto);
-                            result.Count = result.Tfrom.length+result.Tto.length;
+                            result.Count = result.Tfrom.length + result.Tto.length;
                             $scope.result = result;
                         });
                     }, 1000);
@@ -281,7 +286,7 @@ if (isset($_GET['logout'])) {
                         <a class="navbar-brand" href="index.php" style="padding: 5px;height: auto;"><h1 class="cusname" style="margin: 5px;color: white">HELP</h1></a>
                     </div>
                     <!-- Collect the nav links, forms, and other content for toggling -->
-                    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1" ng-controller="trans">
                         <ul class="nav navbar-nav navbar-right">
                             <li class="hidden active">
                                 <a href="#page-top"></a>
@@ -294,7 +299,32 @@ if (isset($_GET['logout'])) {
                             </li>
                             <li class="page-scroll">
                                 <?php if (isset($_SESSION['userdata'])) { ?>
-                                    <a href="?profile" >Profile <i class="fa fa-user-circle-o" aria-hidden="true"></i></a>
+                                <li class="dropdown">
+                                    <a href="#" style="font: 14px 'Lato', sans-serif;" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                                        Profile 
+                                        <?php if ($_SESSION['userdata']['Ustatus'] == "Online") { ?>
+                                            <i class="fa fa-user-circle-o" aria-hidden="true"></i>
+                                        <?php } else if ($_SESSION['userdata']['Ustatus'] == "Away") { ?>
+                                            <i class="fa fa-bell-slash" aria-hidden="true"></i>
+                                        <?php } else { ?>
+                                            <i class="fa fa-user" aria-hidden="true"></i>
+                                        <?php } ?>
+                                        <span class="caret"></span>
+                                    </a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="#">My Wallet : ${{result.Wallet}}</a></li>
+                                        <li><a href="#">Transections Count : {{result.Count}}</a></li>
+                                        <li><a href="#">Status : <?php echo $_SESSION['userdata']['Ustatus']; ?></a></li>
+                                        <li role="separator" class="divider"></li>
+                                        <?php if ($_SESSION['userdata']['Ustatus'] == "Online") { ?>
+                                            <li><a href="?status=Offline">Go Offline <i class="fa fa-user" aria-hidden="true"></i></a></li>
+                                            <li><a href="?status=Away">Away For Site <i class="fa fa-bell-slash" aria-hidden="true"></i></a></li>
+                                        <?php } else { ?>
+                                            <li><a href="?status=Online">Go Online <i class="fa fa-user-circle" aria-hidden="true"></i></a></li>
+                                        <?php } ?>
+                                        <li><a href="?profile">Profile Info <br>And Transection <i class="fa fa-credit-card-alt" aria-hidden="true"></i></a></li>
+                                    </ul>
+                                </li>
                                 </li>
                                 <li class="page-scroll">  
                                     <a href="?logout" >Logout <i class="glyphicon glyphicon-log-out"></i></a>
@@ -302,6 +332,7 @@ if (isset($_GET['logout'])) {
                                     <a href="Login.php" >Sign in <i class="glyphicon glyphicon-log-in"></i></a>
                                 <?php } ?>
                             </li>
+
                         </ul>
                     </div>
                 </div>
@@ -345,7 +376,7 @@ if (isset($_GET['logout'])) {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr ng-repeat="x in result.trans | orderBy : '-Tdatetime'" >
+                                        <tr ng-repeat="x in result.trans| orderBy : '-Tdatetime'" >
                                             <td>{{x.TID}}</td>
                                             <td>{{x.Ttype}}</td>
                                             <td>{{x.Uname}}</td>

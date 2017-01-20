@@ -96,6 +96,22 @@
     .table-hover tbody tr:hover{
         color: #141414;
     }
+    .dropdown-menu {
+        background-color: #141414;
+    }
+    .navbar-custom .navbar-nav li ul li a:hover{
+        color: #141414;
+    }
+    @media (max-width: 767px) {
+        .navbar-default .navbar-nav .open .dropdown-menu>li>a {
+            color: white; 
+        }
+        .navbar-default .navbar-nav .open .dropdown-menu>li>a:focus, .navbar-default .navbar-nav .open .dropdown-menu>li>a:hover {
+            color: #141414;
+            background-color: white;
+        }
+    }
+
 </style>
 
 

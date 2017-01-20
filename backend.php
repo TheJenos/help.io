@@ -25,11 +25,19 @@ function userinfo() {
     $user['Upass'] = myencyption($data['Upass']);
     $GLOBALS['json']['user'] = $user;
 }
-function transinfo(){
-    $from = SearchARows("`transaction` JOIN `user` ON `transaction`.`Tto`=`user`.`UID` ", array('TID','Tamount','Tto','Uname','Tdatetime',"'Outcome' as `Ttype`"), "Tfrom='".antisqli($GLOBALS['myprofile']['UID'])."'");
-    $to = SearchARows("`transaction` JOIN `user` ON `transaction`.`Tfrom`=`user`.`UID` ", array('TID','Tamount','Tfrom','Uname','Tdatetime',"'Income' as `Ttype`"), "Tto='".antisqli($GLOBALS['myprofile']['UID'])."'");
-    $GLOBALS['json']['Tfrom']=$from;
-    $GLOBALS['json']['Tto']=$to;
+
+function transinfo() {
+    $from = SearchARows("`transaction` JOIN `user` ON `transaction`.`Tto`=`user`.`UID` ", array('TID', 'Tamount', 'Tto', 'Uname', 'Tdatetime', "'Outcome' as `Ttype`"), "Tfrom='" . antisqli($GLOBALS['myprofile']['UID']) . "'");
+    $to = SearchARows("`transaction` JOIN `user` ON `transaction`.`Tfrom`=`user`.`UID` ", array('TID', 'Tamount', 'Tfrom', 'Uname', 'Tdatetime', "'Income' as `Ttype`"), "Tto='" . antisqli($GLOBALS['myprofile']['UID']) . "'");
+    $GLOBALS['json']['Tfrom'] = $from;
+    $GLOBALS['json']['Tto'] = $to;
+}
+
+function online() {
+    if ($GLOBALS['myprofile']['Ustatus'] == "Online" || $GLOBALS['myprofile']['Ustatus'] == "Away") {
+        $data = array('Ulastonline' => "CURRENT_TIMESTAMP");
+        Update("`user`", $data, "UID='" . antisqli($GLOBALS['myprofile']['UID']) . "'");
+    }
 }
 //=====================RUN=====================//
 if (isset($_POST['json'])) {
@@ -45,8 +53,9 @@ if (isset($_POST['json'])) {
     }
     if ($data['Upass'] == $_POST['upass'] || myencyption($data['Upass']) == $_POST['upass']) {
         $json['status'] = "Success";
+        $myprofile = $data;
+        online();
         if (isset($_POST['want'])) {
-            $myprofile = $data;
             call_user_func($_POST['want']);
         }
         exitWithPrint();
@@ -54,7 +63,6 @@ if (isset($_POST['json'])) {
         fail("Invalid Password");
     }
 }
-
 //====================DerectLoging===========================================//
 if (isset($_POST['username'])) {
     $data = SearchARow("`user` NATURAL JOIN `jobs`", array('*'), " Uemail='" . antisqli($_POST['username']) . "' ");

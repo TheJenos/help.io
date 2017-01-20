@@ -139,7 +139,8 @@ function Update($table, $data, $where) {
     $conn = $GLOBALS['con'];
     $cols = "";
     foreach ($data as $key => $value) {
-        $cols .= '`' . $key . "`='" . antisqli($value) . "',";
+        $value = ($value=="CURRENT_TIMESTAMP")?"CURRENT_TIMESTAMP":("'".antisqli($value)."'");
+        $cols .= '`' . $key . "`=".$value.",";
     }
     $cols = substr($cols, 0, strlen($cols) - 1);
     $query = "UPDATE $table SET $cols WHERE $where";
