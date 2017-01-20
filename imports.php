@@ -1,3 +1,5 @@
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#141414">
 <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
 <script src="js/jquery-3.1.1.min.js" type="text/javascript"></script>
 <script src="js/bootstrap.js" type="text/javascript"></script>

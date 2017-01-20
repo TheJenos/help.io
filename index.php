@@ -361,8 +361,7 @@ if (isset($_GET['logout'])) {
                 </div>
             <?php } else { ?>
                 <center>
-                    <h3 class="box-h3" style="padding:20px;margin: 20%">“He has a right to criticize, who has a heart to help.” <br>
-                        ― Abraham Lincoln</h3>
+                    <h3 class="box-h3" style="padding:20px;margin: 20%"><?php echo randQuotes(); ?></h3>
 
                 </center>
             </div>

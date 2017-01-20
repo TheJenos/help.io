@@ -1,6 +1,6 @@
 <?php
 
-$hostname = 'http://localhost/help.io/';
+$hostname = './';
 $host = 'localhost:3306';
 $root = 'root';
 $pass = '';
@@ -22,11 +22,18 @@ if ($handle = opendir('images/bg/')) {
     }
     closedir($handle);
 }
-
+$quotes = array(
+    "“The purpose of life is not to be happy. It is to be useful, to be honorable, to be compassionate, to have it make some difference that you have lived and lived well.”</br>― Ralph Waldo Emerson",
+    "“No one has ever become poor by giving.”<br>― Anne Frank, diary of Anne Frank: the play",
+    "“No one is useless in this world who lightens the burdens of another.”<br>― Charles Dickens",
+    "“When we give cheerfully and accept gratefully, everyone is blessed.” <br>― Maya Angelou",
+    "“You have not lived today until you have done something for someone who can never repay you.” <br>― John Bunyan",
+    "“He has a right to criticize, who has a heart to help.” <br>― Abraham Lincoln",
+    );
 //======================funtions===============================//
 function logit($param) {
-    $newtxt = file_get_contents($GLOBALS['logfile']) . "\n" . $param;
-    file_put_contents($GLOBALS['logfile'], $newtxt);
+    $newtxt = file_get_contents('logs/'.date("Y-m-d").$GLOBALS['logfile']) . "\n" . $param;
+    file_put_contents('logs/'.date("Y-m-d").$GLOBALS['logfile'], $newtxt);
 }
 
 function hostname() {
@@ -46,6 +53,16 @@ function randImages() {
         $randval = rand(0, count($GLOBALS['bgimages']) - 1);
         $val = $GLOBALS['bgimages'][$randval];
         array_splice($GLOBALS['bgimages'], $randval, 1);
+        return $val;
+    } else {
+        return FALSE;
+    }
+}
+function randQuotes() {
+    if(count($GLOBALS['quotes'])>0) {
+        $randval = rand(0, count($GLOBALS['quotes']) - 1);
+        $val = $GLOBALS['quotes'][$randval];
+        array_splice($GLOBALS['quotes'], $randval, 1);
         return $val;
     } else {
         return FALSE;
