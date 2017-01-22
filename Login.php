@@ -57,7 +57,7 @@ if (isset($_SESSION['userdata'])) {
                 background: url('images/bg/<?php echo randImages(); ?>');
                 background-size: 1366px;
             }
-            
+
         </style>
     </head>
     <body >
@@ -83,7 +83,9 @@ if (isset($_SESSION['userdata'])) {
                             <input type="password" name="pass" class="form-control simple" id="pass" ng-model="pass" autocomplete="off">
                         </div>
                         <div class="checkbox">
-                            <label><input name="re" type="checkbox"> Remember me</label>
+                            <p>
+                                <input name="re" type="checkbox" id="test1"><label for="test1"> Remember me</label>
+                            </p>
                         </div>
                         <div style="text-align: right">
                             <input type="button" id="loginbtn" name="login" class="simple" value="Login">

@@ -95,6 +95,8 @@ if (isset($_GET['logout'])) {
                 background-size: cover;
             }
             .snip1336 {
+                position: relative;
+                margin-top: 10px;
                 font-family: 'Roboto', Arial, sans-serif;
                 overflow: hidden;
                 min-width: 230px;
@@ -103,6 +105,12 @@ if (isset($_GET['logout'])) {
                 text-align: left;
                 line-height: 1.4em;
                 background-color: #141414;
+            }
+            .snip1336 .lastonline {
+                position: absolute;
+                top: 0px;
+                right: 9px;
+                background: #141414;
             }
             .snip1336 * {
                 -webkit-box-sizing: border-box;
@@ -234,6 +242,7 @@ if (isset($_GET['logout'])) {
                 app.controller("userinfo", function($scope, $interval) {
                     var datas = '<?php echo json_encode($_SESSION['userdata']); ?>';
                     $scope.User = $.parseJSON(datas);
+                    $scope.User.Ulastonline = "Wait A Movement";
                     $interval(function() {
                         $.post("backend.php", {
                             "uname": "<?php echo $_SESSION['userdata']['Uemail']; ?>",
@@ -245,6 +254,7 @@ if (isset($_GET['logout'])) {
                             if (result.status == "Fail") {
                                 showError(result.msg);
                             }
+                            result.user.Ulastonline = ($.timeago(result.user.Ulastonline) == "Online ago") ? (result.user.Ustatus == "Online") ? "Online Now" : "Online But Away" : "Last Online " + $.timeago(result.user.Ulastonline);
                             $scope.User = result.user;
                         });
                     }, 5000);
@@ -271,6 +281,32 @@ if (isset($_GET['logout'])) {
                         });
                     }, 1000);
                 });
+                app.controller("search", function($scope) {
+                    $scope.find = "skill";
+                    $scope.$watch('find', function(value) {
+                        $scope.searcharc();
+                    });
+                    $scope.searcharc = function() {
+                        $.post("backend.php", {
+                            "uname": "<?php echo $_SESSION['userdata']['Uemail']; ?>",
+                            "upass": "<?php echo $_SESSION['userdata']['Upass']; ?>",
+                            "want": "searchHealper",
+                            "search": $scope.searchtxt,
+                            "find": $scope.find,
+                            "json": true
+                        }).done(function(response) {
+                            var result = $.parseJSON(response);
+                            if (result.status == "Fail") {
+                                showError(result.msg);
+                            }
+                            $.each(result.found, function(index, value) {
+                                value.Ulastonline = ($.timeago(value.Ulastonline) == "Online ago") ? (value.Ustatus == "Online") ? "Online Now" : "Online But Away" : "Last Online " + $.timeago(value.Ulastonline);
+                            });
+                            $scope.result = result;
+                        });
+                    };
+                });
+
 <?php } ?>
         </script>
     </head>
@@ -292,10 +328,10 @@ if (isset($_GET['logout'])) {
                                 <a href="#page-top"></a>
                             </li>
                             <li class="page-scroll">
-                                <a href="#about">Phones</a>
+                                <a href="#">Phones</a>
                             </li>
                             <li class="page-scroll">
-                                <a href="#contact">News</a>
+                                <a href="?helpers">Helpers</a>
                             </li>
                             <li class="page-scroll">
                                 <?php if (isset($_SESSION['userdata'])) { ?>
@@ -338,16 +374,65 @@ if (isset($_GET['logout'])) {
                 </div>
 
             </nav>
-            <?php if (isset($_SESSION['userdata']) && isset($_GET['profile'])) { ?>
+            <div class="container">
+                <div class="alert alert-danger" id="error"></div>
+            </div>
+            <?php if (isset($_SESSION['userdata']) && isset($_GET['helpers'])) { ?>
+                <center ng-controller="search">
+                    <h3 style="text-align:left;margin-bottom: 40px;width: 90%" class="box-h3">
+                        <form>
+                            Search <input type="text" style="width: 280px;height: 40px;width: 88%;" name="username" class="form-control simple" id="user" ng-model="searchtxt" autocomplete="off" ng-change="searcharc()"><br>
+                            <p style="text-align:left"> 
+                                Search By 
+                                <input name="re" type="radio" ng-model="find" id="test3" value="skill"><label for="test3" ng-click="searcharc()"> Skills</label>
+                                <input name="re" type="radio" ng-model="find" id="test1" checked="ture" value="job"><label for="test1" ng-click="searcharc()"> Job</label>
+                                <input name="re" type="radio" ng-model="find" id="test2" value="name"><label for="test2" ng-click="searcharc()"> Name</label>
+                            </p>
+                        </form>
+                    </h3>
+                    <div class="row"  >
+                        <div class="container">
+                            <div class="dialogbox well">
+                                <div ng-controller="userinfo">
+                                    <figure class="snip1336">
+                                        <img ng-src="<?php echo $hostname; ?>{{User.Ubgimage}}" alt="sample87" />
+                                        <b class="simple lastonline" >{{User.Ulastonline}}</b>
+                                        <figcaption>
+                                            <img ng-src="<?php echo $hostname; ?>{{User.Upic}}" width="64" alt="profile-sample4" class="profile" />
+                                            <h2>{{User.Uname}}({{User.Rate}})<span>{{User.Jname}}</span></h2>
+                                            <p>{{User.Udiscription}}</p>
+                                            <a href="#" style="width:100%" class="">Edit Profile</a>
+                                        </figcaption>
+                                    </figure>
+                                </div>
+                            </div>
+                            <div class="col-md-4" ng-repeat="x in result.found" >
+                                <figure class="snip1336" >
+                                    <img ng-src="<?php echo $hostname; ?>{{x.Ubgimage}}" alt="sample87" />
+                                    <b class="simple lastonline" >{{x.Ulastonline}}</b>
+                                    <figcaption>
+                                        <img ng-src="<?php echo $hostname; ?>{{x.Upic}}" width="64" alt="profile-sample4" class="profile" />
+                                        <h2>{{x.Uname}}({{x.Rate}})<span>{{x.Jname}}<br></span></h2>
+                                        <p>{{x.Udiscription}}</p>
+                                        <a href="#" style="width:100%" class="">Request</a>
+                                    </figcaption>
+                                </figure>
+
+                            </div>
+                        </div>
+                    </div>
+                </center>
+            <?php } else if (isset($_SESSION['userdata']) && isset($_GET['profile'])) { ?>
                 <div class="row"  >
                     <div class="container">
                         <?php if (isset($_SESSION['userdata'])) { ?>
                             <div class="col-md-4" ng-controller="userinfo">
                                 <figure class="snip1336">
                                     <img ng-src="<?php echo $hostname; ?>{{User.Ubgimage}}" alt="sample87" />
+                                    <b class="simple lastonline" >{{User.Ulastonline}}</b>
                                     <figcaption>
                                         <img ng-src="<?php echo $hostname; ?>{{User.Upic}}" width="64" alt="profile-sample4" class="profile" />
-                                        <h2>{{User.Uname}}<span>{{User.Jname}}</span></h2>
+                                        <h2>{{User.Uname}}({{User.Rate}})<span>{{User.Jname}}</span></h2>
                                         <p>{{User.Udiscription}}</p>
                                         <a href="#" style="width:100%" class="">Edit Profile</a>
                                     </figcaption>
@@ -356,13 +441,12 @@ if (isset($_GET['logout'])) {
                             </div>
                         <?php } ?>
                         <div class="col-md-8" ng-controller="trans">
-                            <div class="alert alert-danger" id="error"></div>
                             <div class="well" style="">
                                 <div style="display: inline-block;width: 100%;">
                                     <h4 class="float-left">My Wallet : ${{result.Wallet}}</h4>
                                     <h4 class="float-right">Transections Count : {{result.Count}}</h4> 
                                 </div>
-                                <hr>
+                                <hr style="animation: loader 2s;">
                                 <h3 style="margin-top:20px;margin-bottom: 10px;color:#2980b9">My Transections</h3>
                                 <table class="table table-responsive table-hover">
                                     <thead>
@@ -452,6 +536,7 @@ if (isset($_GET['logout'])) {
                         <div class="col-md-4" ng-controller="userinfo">
                             <figure class="snip1336">
                                 <img ng-src="<?php echo $hostname; ?>{{User.Ubgimage}}" alt="sample87" />
+                                <b class="simple lastonline" >{{User.Ulastonline}}</b>
                                 <figcaption>
                                     <img ng-src="<?php echo $hostname; ?>{{User.Upic}}" width="64" alt="profile-sample4" class="profile" />
                                     <h2>{{User.Uname}}({{User.Urate}})<span>{{User.Jname}}</span></h2>
@@ -463,6 +548,7 @@ if (isset($_GET['logout'])) {
                         <div class="col-md-4" ng-controller="userinfo">
                             <figure class="snip1336">
                                 <img ng-src="<?php echo $hostname; ?>{{User.Ubgimage}}" alt="sample87" />
+                                <b class="simple lastonline" >{{User.Ulastonline}}</b>
                                 <figcaption>
                                     <img ng-src="<?php echo $hostname; ?>{{User.Upic}}" width="64" alt="profile-sample4" class="profile" />
                                     <h2>{{User.Uname}}({{User.Urate}})<span>{{User.Jname}}</span></h2>
@@ -474,6 +560,7 @@ if (isset($_GET['logout'])) {
                         <div class="col-md-4" ng-controller="userinfo">
                             <figure class="snip1336">
                                 <img ng-src="<?php echo $hostname; ?>{{User.Ubgimage}}" alt="sample87" />
+                                <b class="simple lastonline" >{{User.Ulastonline}}</b>
                                 <figcaption>
                                     <img ng-src="<?php echo $hostname; ?>{{User.Upic}}" width="64" alt="profile-sample4" class="profile" />
                                     <h2>{{User.Uname}}({{User.Urate}})<span>{{User.Jname}}</span></h2>

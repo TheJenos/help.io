@@ -4,12 +4,21 @@
 <script src="js/jquery-3.1.1.min.js" type="text/javascript"></script>
 <script src="js/bootstrap.js" type="text/javascript"></script>
 <script src="js/jquery-3.1.1.js" type="text/javascript"></script>
+<script src="js/jquery.timeago.js" type="text/javascript"></script>
 <script src="js/angular.min.js" type="text/javascript"></script>
 <link rel="stylesheet" type="text/css" href="css/freelancer.min.css">
 <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
 <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css">
 <link href="http://fontawesome.io/assets/font-awesome/css/font-awesome.css" rel="stylesheet" type="text/css">
 <style>
+    @keyframes loader {
+        from{
+            width:0%;
+        }
+        to {
+            width:100%;
+        }
+    }
     .simple{
         padding: 5px;
         border: 1px solid #ffffff;
@@ -18,13 +27,22 @@
         text-transform: none !important;
         margin: 10px 0;
         display: inline-block;
-        opacity: 0.65;
         padding: 5px 15px;
         text-align: center;
         text-decoration: none;
         font-weight: 600;
         letter-spacing: 1px;
         background: transparent;
+        outline: none;
+        border-radius: 0px;
+    }
+    .simple[type=button]{
+        opacity: 0.65;
+    }
+    .simple:focus{
+        outline: none;
+        box-shadow: none;
+        -webkit-box-shadow: none;
     }
     hr{
         color: white;
@@ -111,7 +129,147 @@
             background-color: white;
         }
     }
+    /* Base for label styling */
+    [type="checkbox"]:not(:checked),
+    [type="checkbox"]:checked {
+        position: absolute;
+        left: -9999px;
+    }
+    [type="checkbox"]:not(:checked) + label,
+    [type="checkbox"]:checked + label {
+        position: relative;
+        padding-left: 30px;
+        padding-top: 6px;
+        cursor: pointer;
+    }
 
+    /* checkbox aspect */
+    [type="checkbox"]:not(:checked) + label:before,
+    [type="checkbox"]:checked + label:before {
+        content: '';
+        position: absolute;
+        left:0; top: 1px;
+        width: 23px; height: 23px;
+        border: 1px solid white;
+        box-shadow: inset 0 1px 3px rgba(0,0,0,.1);
+    }
+    /* checked mark aspect */
+    [type="checkbox"]:not(:checked) + label:after,
+    [type="checkbox"]:checked + label:after {
+        content: '✔';
+        position: absolute;
+        top: 4px; left: 4px;
+        font-size: 19px;
+        line-height: 0.8;
+        color: white;
+        transition: all .2s;
+    }
+    /* checked mark aspect changes */
+    [type="checkbox"]:not(:checked) + label:after {
+        opacity: 0;
+        transform: scale(0);
+    }
+    [type="checkbox"]:checked + label:after {
+        opacity: 1;
+        transform: scale(1);
+    }
+    /* disabled checkbox */
+    [type="checkbox"]:disabled:not(:checked) + label:before,
+    [type="checkbox"]:disabled:checked + label:before {
+        box-shadow: none;
+        border-color: white;
+        background-color: #ddd;
+    }
+    [type="checkbox"]:disabled:checked + label:after {
+        color: #999;
+    }
+    [type="checkbox"]:disabled + label {
+        color: #aaa;
+    }
+    /* accessibility */
+    [type="checkbox"]:checked:focus + label:before,
+    [type="checkbox"]:not(:checked):focus + label:before {
+        border: 1px dotted white;
+    }
+
+    /* hover style just for information */
+    label:hover:before {
+        border: 1px solid white!important;
+    }
+    /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+    [type="radio"]:not(:checked),
+    [type="radio"]:checked {
+        position: absolute;
+        left: -9999px;
+    }
+    [type="radio"]:not(:checked) + label,
+    [type="radio"]:checked + label {
+        position: relative;
+        padding-left: 30px;
+        padding-top: 6px;
+        cursor: pointer;
+    }
+
+    /* checkbox aspect */
+    [type="radio"]:not(:checked) + label:before,
+    [type="radio"]:checked + label:before {
+        content: '';
+        position: absolute;
+        left:0; top: 1px;
+        width: 23px; height: 23px;
+        border: 1px solid white;
+        box-shadow: inset 0 1px 3px rgba(0,0,0,.1);
+    }
+    /* checked mark aspect */
+    [type="radio"]:not(:checked) + label:after,
+    [type="radio"]:checked + label:after {
+        content: '+';
+        position: absolute;
+        top: 1px; left: 4px;
+        font-size: 25px;
+        line-height: 0.8;
+        color: white;
+        transition: all .2s;
+    }
+    /* checked mark aspect changes */
+    [type="radio"]:not(:checked) + label:after {
+        opacity: 0;
+        transform: scale(0);
+    }
+    [type="radio"]:checked + label:after {
+        opacity: 1;
+        transform: scale(1);
+    }
+    /* disabled checkbox */
+    [type="radio"]:disabled:not(:checked) + label:before,
+    [type="radio"]:disabled:checked + label:before {
+        box-shadow: none;
+        border-color: white;
+        background-color: #ddd;
+    }
+    [type="radio"]:disabled:checked + label:after {
+        color: #999;
+    }
+    [type="radio"]:disabled + label {
+        color: #aaa;
+    }
+    /* accessibility */
+    [type="radio"]:checked:focus + label:before,
+    [type="radio"]:not(:checked):focus + label:before {
+        border: 1px dotted white;
+    }
+
+    /* hover style just for information */
+    label:hover:before {
+        border: 1px solid white!important;
+    }
+    .dialogbox{
+        position: fixed;
+        top: 25%;
+        left: 25%;
+        width: 50%;
+        z-index: 99999;
+    }
 </style>
 
 

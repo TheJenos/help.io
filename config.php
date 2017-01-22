@@ -96,7 +96,7 @@ function links() {
 //===========================Login With Cookie===============================//
 function CookieLogin() {
     if (isset($_COOKIE['username'])) {
-        $data = SearchARow("`user` NATURAL JOIN `jobs`", array('*'), " Uemail='" . antisqli($_COOKIE['username']) . "' ");
+        $data = SearchARow("`user` NATURAL JOIN `jobs`", array('*','(Urate/Uratetime) AS `Rate`'), " Uemail='" . antisqli($_COOKIE['username']) . "' ");
         if (!isset($data)) {
             session_destroy();
         }
