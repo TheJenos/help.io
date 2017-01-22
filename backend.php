@@ -20,7 +20,7 @@ function fail($msg) {
 
 function userinfo() {
     $user = array();
-    $data = SearchARow("`user` NATURAL JOIN `jobs`", array('*','(Urate/Uratetime) AS `Rate`'), "Uemail='" . antisqli($_SESSION['userdata']['Uemail']) . "' ");
+    $data = SearchARow("`user` NATURAL JOIN `jobs`", array('*', '(Urate/Uratetime) AS `Rate`'), "Uemail='" . antisqli($_SESSION['userdata']['Uemail']) . "' ");
     $user = $data;
     $user['Upass'] = myencyption($data['Upass']);
     $GLOBALS['json']['user'] = $user;
@@ -41,15 +41,21 @@ function online() {
 }
 
 function searchHealper() {
-    if(isset($_POST['search'])&& $_POST['search']!=""){
-    if($_POST['find']=="job") {
-        $result = SearchARows("`user` NATURAL JOIN `jobs` ", array('*','(Urate/Uratetime) AS `Rate`'), " `UID`!='" . antisqli($GLOBALS['myprofile']['UID']) . "' AND `Jname` LIKE '" . antisqli($_POST['search']) . "%' AND `Ustatus` IN ('Online','Away') ORDER BY `Rate`,`Ulastonline` DESC LIMIT 10");
-    } else if ($_POST['find']=="skill"){
-        $result = SearchARows("`user` NATURAL JOIN `jobs` ", array('*','(Urate/Uratetime) AS `Rate`'), " `UID`!='" . antisqli($GLOBALS['myprofile']['UID']) . "' AND `Jname` LIKE '" . antisqli($_POST['search']) . "%' AND `Ustatus` IN ('Online','Away') ORDER BY `Rate`,`Ulastonline` DESC LIMIT 10");
-    } else {
-        $result = SearchARows("`user` NATURAL JOIN `jobs` ", array('*','(Urate/Uratetime) AS `Rate`'), " `UID`!='" . antisqli($GLOBALS['myprofile']['UID']) . "' AND `Uname` LIKE '" . antisqli($_POST['search']) . "%' AND `Ustatus` IN ('Online','Away') ORDER BY `Rate`,`Ulastonline` DESC LIMIT 10");
-    }
-    $GLOBALS['json']['found'] = $result;
+    if (isset($_POST['search']) && $_POST['search'] != "") {
+        if ($_POST['find'] == "job") {
+            $result = SearchARows("`user` NATURAL JOIN `jobs` ", array('*', '(Urate/Uratetime) AS `Rate`'), " `UID`!='" . antisqli($GLOBALS['myprofile']['UID']) . "' AND `Jname` LIKE '" . antisqli($_POST['search']) . "%' AND `Ustatus` IN ('Online','Away') ORDER BY `Rate`,`Ulastonline` DESC LIMIT 10");
+        } else if ($_POST['find'] == "skill") {
+            $data = explode(",", $_POST['search']);
+            $where= "";
+            foreach ($data as $value) {
+                $where .= "'$value',";
+            }
+            $where = substr($where, 0, strlen($where) - 1);
+            $result = SearchARows("`skills_of_user` NATURAL JOIN `user` NATURAL JOIN `skills` NATURAL JOIN `jobs`", array('*', '(Urate/Uratetime) AS `Rate`'), " `UID`!='" . antisqli($GLOBALS['myprofile']['UID']) . "' AND `Sname` IN ($where) AND `Ustatus` IN ('Online','Away') GROUP BY `UID` ORDER BY `Rate`,`Ulastonline` DESC LIMIT 10");
+        } else {
+            $result = SearchARows("`user` NATURAL JOIN `jobs` ", array('*', '(Urate/Uratetime) AS `Rate`'), " `UID`!='" . antisqli($GLOBALS['myprofile']['UID']) . "' AND `Uname` LIKE '" . antisqli($_POST['search']) . "%' AND `Ustatus` IN ('Online','Away') ORDER BY `Rate`,`Ulastonline` DESC LIMIT 10");
+        }
+        $GLOBALS['json']['found'] = $result;
     }
 }
 
@@ -61,7 +67,7 @@ if (isset($_POST['json'])) {
     if (!isset($_POST['upass'])) {
         fail("Password Missing");
     }
-    $data = SearchARow("user", array('*','(Urate/Uratetime) AS `Rate`'), "Uemail='" . antisqli($_POST['uname']) . "' ");
+    $data = SearchARow("user", array('*', '(Urate/Uratetime) AS `Rate`'), "Uemail='" . antisqli($_POST['uname']) . "' ");
     if (!isset($data)) {
         fail("Invalid Username");
     }
@@ -79,7 +85,7 @@ if (isset($_POST['json'])) {
 }
 //====================DerectLoging===========================================//
 if (isset($_POST['username'])) {
-    $data = SearchARow("`user` NATURAL JOIN `jobs`", array('*','(Urate/Uratetime) AS `Rate`'), " Uemail='" . antisqli($_POST['username']) . "' ");
+    $data = SearchARow("`user` NATURAL JOIN `jobs`", array('*', '(Urate/Uratetime) AS `Rate`'), " Uemail='" . antisqli($_POST['username']) . "' ");
     if (!isset($data)) {
         logit(mysqli_error($con));
         header("Location: Login.php");

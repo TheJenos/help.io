@@ -177,6 +177,7 @@ function SearchARows($table, $rows, $where) {
     }
     $cols = substr($cols, 0, strlen($cols) - 1);
     $query = "SELECT " . $cols . " FROM $table WHERE $where";
+    logit($query);
     $result = mysqli_query($con, $query);
     $datalines = array();
     while ($row = mysqli_fetch_assoc($result)) {

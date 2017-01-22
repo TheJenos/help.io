@@ -400,17 +400,8 @@ if (isset($_GET['logout'])) {
                         <div class="container">
                             <div id='reqs' class="dialogbox well">
                                 <div class="form-group">
-                                    <label for="email">Username or Email</label>
-                                    <input type="text" name="username" class="form-control simple" id="user" ng-model="username" autocomplete="off">
-                                </div>
-                                <div class="form-group">
-                                    <label for="pwd">Password</label>
-                                    <input type="password" name="pass" class="form-control simple" id="pass" ng-model="pass" autocomplete="off">
-                                </div>
-                                <div class="checkbox">
-                                    <p>
-                                        <input name="r" type="checkbox" id="tes1"><label for="tes1"> Remember me</label>
-                                    </p>
+                                    <label for="email">Helping Time Period</label>
+                                    <input type="number" name="username" class="form-control simple" id="user" ng-model="time" autocomplete="off">
                                 </div>
                                 <div style="text-align: right">
                                     <input type="button" id="loginbtn" name="login" class="simple" value="Close" onClick="hideDialog('#reqs')">
