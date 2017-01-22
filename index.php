@@ -226,6 +226,12 @@ if (isset($_GET['logout'])) {
                     $('#error').fadeOut('fast');
                 }, 2000);
             }
+            function showDialog($id) {
+                $($id).fadeIn();
+            }
+            function hideDialog($id) {
+                $($id).fadeOut();
+            }
             function sum(a, b) {
                 if (typeof (a.Tamount) == "undefined") {
                     return b.Tamount;
@@ -237,6 +243,7 @@ if (isset($_GET['logout'])) {
             }
             $(function() {
                 $('#error').hide();
+                $('.dialogbox').hide();
             });
 <?php if (isset($_SESSION['userdata'])) { ?>
                 app.controller("userinfo", function($scope, $interval) {
@@ -331,10 +338,10 @@ if (isset($_GET['logout'])) {
                                 <a href="#">Phones</a>
                             </li>
                             <li class="page-scroll">
-                                <a href="?helpers">Helpers</a>
-                            </li>
-                            <li class="page-scroll">
                                 <?php if (isset($_SESSION['userdata'])) { ?>
+                                    <a href="?helpers">Helpers</a>
+                                </li>
+                                <li class="page-scroll">
                                 <li class="dropdown">
                                     <a href="#" style="font: 14px 'Lato', sans-serif;" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
                                         Profile 
@@ -360,7 +367,6 @@ if (isset($_GET['logout'])) {
                                         <?php } ?>
                                         <li><a href="?profile">Profile Info <br>And Transection <i class="fa fa-credit-card-alt" aria-hidden="true"></i></a></li>
                                     </ul>
-                                </li>
                                 </li>
                                 <li class="page-scroll">  
                                     <a href="?logout" >Logout <i class="glyphicon glyphicon-log-out"></i></a>
@@ -392,18 +398,23 @@ if (isset($_GET['logout'])) {
                     </h3>
                     <div class="row"  >
                         <div class="container">
-                            <div class="dialogbox well">
-                                <div ng-controller="userinfo">
-                                    <figure class="snip1336">
-                                        <img ng-src="<?php echo $hostname; ?>{{User.Ubgimage}}" alt="sample87" />
-                                        <b class="simple lastonline" >{{User.Ulastonline}}</b>
-                                        <figcaption>
-                                            <img ng-src="<?php echo $hostname; ?>{{User.Upic}}" width="64" alt="profile-sample4" class="profile" />
-                                            <h2>{{User.Uname}}({{User.Rate}})<span>{{User.Jname}}</span></h2>
-                                            <p>{{User.Udiscription}}</p>
-                                            <a href="#" style="width:100%" class="">Edit Profile</a>
-                                        </figcaption>
-                                    </figure>
+                            <div id='reqs' class="dialogbox well">
+                                <div class="form-group">
+                                    <label for="email">Username or Email</label>
+                                    <input type="text" name="username" class="form-control simple" id="user" ng-model="username" autocomplete="off">
+                                </div>
+                                <div class="form-group">
+                                    <label for="pwd">Password</label>
+                                    <input type="password" name="pass" class="form-control simple" id="pass" ng-model="pass" autocomplete="off">
+                                </div>
+                                <div class="checkbox">
+                                    <p>
+                                        <input name="r" type="checkbox" id="tes1"><label for="tes1"> Remember me</label>
+                                    </p>
+                                </div>
+                                <div style="text-align: right">
+                                    <input type="button" id="loginbtn" name="login" class="simple" value="Close" onClick="hideDialog('#reqs')">
+                                    <input type="button" id="loginbtn" name="login" class="simple" value="Login">
                                 </div>
                             </div>
                             <div class="col-md-4" ng-repeat="x in result.found" >
@@ -414,7 +425,7 @@ if (isset($_GET['logout'])) {
                                         <img ng-src="<?php echo $hostname; ?>{{x.Upic}}" width="64" alt="profile-sample4" class="profile" />
                                         <h2>{{x.Uname}}({{x.Rate}})<span>{{x.Jname}}<br></span></h2>
                                         <p>{{x.Udiscription}}</p>
-                                        <a href="#" style="width:100%" class="">Request</a>
+                                        <a href="#" style="width:100%" class="" onClick="showDialog('#reqs')">Request</a>
                                     </figcaption>
                                 </figure>
 
