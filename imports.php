@@ -295,6 +295,42 @@
         z-index: -1;
         background: rgba(0, 0, 0, 0.79);
     }
+    .chips {
+        border: none;
+        border-bottom: 1px solid #9e9e9e;
+        box-shadow: none;
+        min-height: 35px;
+        outline: none;
+        margin-top: 5px;
+        transition: all .3s;
+    }
+    .chips .input {
+        background: none;
+        border: 0;
+        color: rgba(0,0,0,0.6);
+        display: inline-block;
+        height: 3rem;
+        line-height: 27px;
+        font-size: 19px;
+        outline: 0;
+        margin: 0;
+        padding: 0 !important;
+        color: white;
+        width: 120px !important;
+    }
+    .chip {
+        display: inline-block;
+        height: 32px;
+        font-size: 13px;
+        font-weight: 500;
+        color: rgba(0,0,0,0.6);
+        line-height: 32px;
+        padding: 0 12px;
+        border: 1px solid white;
+        color: white;
+        margin-bottom: 5px;
+        margin-right: 5px;
+    }
     @media (max-width: 767px) {
         .navbar-default .navbar-nav .open .dropdown-menu>li>a {
             color: white; 

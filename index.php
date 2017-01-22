@@ -241,6 +241,12 @@ if (isset($_GET['logout'])) {
                 }
                 return a.Tamount + b.Tamount;
             }
+            function runScript(txt,e) {
+                if (e.keyCode == 13) {
+                    var chip = '<div class="chip">'+txt+'<i class="fa fa-times" onclick="$(this).parent().remove()"></i></div>';
+                    $('#searchbox').html(chip + $('#searchbox').html());
+                }
+            }
             $(function() {
                 $('#error').hide();
                 $('.dialogbox').hide();
@@ -386,15 +392,17 @@ if (isset($_GET['logout'])) {
             <?php if (isset($_SESSION['userdata']) && isset($_GET['helpers'])) { ?>
                 <center ng-controller="search">
                     <h3 style="text-align:left;margin-bottom: 40px;width: 90%" class="box-h3">
-                        <form>
-                            Search <input type="text" style="width: 280px;height: 40px;width: 88%;" name="username" class="form-control simple" id="user" ng-model="searchtxt" autocomplete="off" ng-change="searcharc()"><br>
-                            <p style="text-align:left"> 
-                                Search By 
-                                <input name="re" type="radio" ng-model="find" id="test3" value="skill"><label for="test3" ng-click="searcharc()"> Skills</label>
-                                <input name="re" type="radio" ng-model="find" id="test1" checked="ture" value="job"><label for="test1" ng-click="searcharc()"> Job</label>
-                                <input name="re" type="radio" ng-model="find" id="test2" value="name"><label for="test2" ng-click="searcharc()"> Name</label>
-                            </p>
-                        </form>
+                        Search
+                        <div class="chips" id="searchbox">
+                            <input type="text" name="username" class="input" id="searchtxt" ng-model="searchtxt" autocomplete="off" onkeyup="return runScript(this.value,event)" ng-change="searcharc()">
+                        </div>
+                        <br>
+                        <p style="text-align:left">
+                            Search By 
+                            <input name="re" type="radio" ng-model="find" id="test3" value="skill"><label for="test3" ng-click="searcharc()"> Skills</label>
+                            <input name="re" type="radio" ng-model="find" id="test1" checked="ture" value="job"><label for="test1" ng-click="searcharc()"> Job</label>
+                            <input name="re" type="radio" ng-model="find" id="test2" value="name"><label for="test2" ng-click="searcharc()"> Name</label>
+                        </p>
                     </h3>
                     <div class="row"  >
                         <div class="container">
