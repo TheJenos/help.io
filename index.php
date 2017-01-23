@@ -219,6 +219,7 @@ if (isset($_GET['logout'])) {
         </style>
         <script type="text/javascript">
             var app = angular.module("home", []);
+            var sellect = "skill";
             function showError($txt) {
                 $('#error').fadeIn('fast');
                 $('#error').html($txt);
@@ -241,11 +242,14 @@ if (isset($_GET['logout'])) {
                 }
                 return a.Tamount + b.Tamount;
             }
-            function runScript(txt,e) {
-                if (e.keyCode == 13) {
-                    var chip = '<div class="chip">'+txt+'<i class="fa fa-times" onclick="$(this).parent().remove()"></i></div>';
-                    $('#searchbox').html(chip + $('#searchbox').html());
+            function getchips() {
+                var txt = "";
+                var chips = $('.chip');
+                for (var i = 0; i < chips.length; i++) {
+                    txt += $(chips[i]).attr("value") + ",";
                 }
+                txt = txt.substring(0, txt.length - 1);
+                return txt;
             }
             $(function() {
                 $('#error').hide();
@@ -297,14 +301,24 @@ if (isset($_GET['logout'])) {
                 app.controller("search", function($scope) {
                     $scope.find = "skill";
                     $scope.$watch('find', function(value) {
+                        $('#chiparea').html("");
                         $scope.searcharc();
                     });
+                    $scope.runScript = function(txt, e) {
+                        if (sellect == "skill" && e.which == 13) {
+                            var chip = '<div class="chip" value="' + $scope.searchtxt + '">' + $scope.searchtxt + '<i class="fa fa-times" onclick="$(this).parent().remove()"></i></div>';
+                            $('#chiparea').html($('#chiparea').html() + chip);
+                            $scope.searchtxt="";
+                            $scope.searcharc();
+                        }
+                    }
                     $scope.searcharc = function() {
+                        sellect = $scope.find;
                         $.post("backend.php", {
                             "uname": "<?php echo $_SESSION['userdata']['Uemail']; ?>",
                             "upass": "<?php echo $_SESSION['userdata']['Upass']; ?>",
                             "want": "searchHealper",
-                            "search": $scope.searchtxt,
+                            "search": ($scope.find == "skill") ? getchips() : $scope.searchtxt,
                             "find": $scope.find,
                             "json": true
                         }).done(function(response) {
@@ -393,8 +407,10 @@ if (isset($_GET['logout'])) {
                 <center ng-controller="search">
                     <h3 style="text-align:left;margin-bottom: 40px;width: 90%" class="box-h3">
                         Search
-                        <div class="chips" id="searchbox">
-                            <input type="text" name="username" class="input" id="searchtxt" ng-model="searchtxt" autocomplete="off" onkeyup="return runScript(this.value,event)" ng-change="searcharc()">
+                        <div class="chips" id="searchbox" onclick="$('#searchtxt').focus();">
+                            <div id="chiparea" style="display: inline;">
+                            </div>
+                            <input type="text" name="username" class="input" ng-keyup="runScript(this.value, $event)" id="searchtxt" ng-model="searchtxt" autocomplete="off" ng-change="searcharc()">
                         </div>
                         <br>
                         <p style="text-align:left">
