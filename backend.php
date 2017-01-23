@@ -46,12 +46,17 @@ function searchHealper() {
             $result = SearchARows("`user` NATURAL JOIN `jobs` ", array('*', '(Urate/Uratetime) AS `Rate`'), " `UID`!='" . antisqli($GLOBALS['myprofile']['UID']) . "' AND `Jname` LIKE '" . antisqli($_POST['search']) . "%' AND `Ustatus` IN ('Online','Away') ORDER BY `Rate`,`Ulastonline` DESC LIMIT 10");
         } else if ($_POST['find'] == "skill") {
             $data = explode(",", $_POST['search']);
-            $where= "";
+            $where = "";
             foreach ($data as $value) {
                 $where .= "'$value',";
             }
             $where = substr($where, 0, strlen($where) - 1);
             $result = SearchARows("`skills_of_user` NATURAL JOIN `user` NATURAL JOIN `skills` NATURAL JOIN `jobs`", array('*', '(Urate/Uratetime) AS `Rate`'), " `UID`!='" . antisqli($GLOBALS['myprofile']['UID']) . "' AND `Sname` IN ($where) AND `Ustatus` IN ('Online','Away') GROUP BY `UID` ORDER BY `Rate`,`Ulastonline` DESC LIMIT 10");
+            for ($index = 0; $index < count($result); $index++) {
+                $skilldata = SearchARows("`skills_of_user` NATURAL JOIN `skills`", array('*'), "`UID`='" + antisqli($result[$index]['UID']) + "'");
+                $result[$index]['Udiscription'] = "";
+                $result[$index]['Skills'] = $skilldata;
+            }
         } else {
             $result = SearchARows("`user` NATURAL JOIN `jobs` ", array('*', '(Urate/Uratetime) AS `Rate`'), " `UID`!='" . antisqli($GLOBALS['myprofile']['UID']) . "' AND `Uname` LIKE '" . antisqli($_POST['search']) . "%' AND `Ustatus` IN ('Online','Away') ORDER BY `Rate`,`Ulastonline` DESC LIMIT 10");
         }

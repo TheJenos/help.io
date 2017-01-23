@@ -440,6 +440,9 @@ if (isset($_GET['logout'])) {
                                         <img ng-src="<?php echo $hostname; ?>{{x.Upic}}" width="64" alt="profile-sample4" class="profile" />
                                         <h2>{{x.Uname}}({{x.Rate}})<span>{{x.Jname}}<br></span></h2>
                                         <p>{{x.Udiscription}}</p>
+                                        <ul style="padding-left: 15px;">
+                                            <li ng-repeat="y in x.Skills">{{y.Sname}}</li>
+                                        </ul>
                                         <a href="#" style="width:100%" class="" onClick="showDialog('#reqs')">Request</a>
                                     </figcaption>
                                 </figure>
