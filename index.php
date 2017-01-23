@@ -226,15 +226,13 @@ if (isset($_GET['logout'])) {
         <script type="text/javascript">
             var app = angular.module("home", []);
             var sellect = "skill";
+            var wallet = 0;
             function showError($txt) {
                 $('#error').fadeIn('fast');
                 $('#error').html($txt);
                 setTimeout(function() {
                     $('#error').fadeOut('fast');
                 }, 2000);
-            }
-            function showDialog($id) {
-                $($id).fadeIn();
             }
             function hideDialog($id) {
                 $($id).fadeOut();
@@ -298,6 +296,7 @@ if (isset($_GET['logout'])) {
                             var fromsum = result.Tfrom.reduce(sum, 0);
                             var tosum = result.Tto.reduce(sum, 0);
                             result.Wallet = tosum - fromsum;
+                            wallet = tosum - fromsum;
                             result.trans = result.Tfrom.concat(result.Tto);
                             result.Count = result.Tfrom.length + result.Tto.length;
                             $scope.result = result;
@@ -321,6 +320,16 @@ if (isset($_GET['logout'])) {
                             chips[chips.length - 1].remove();
                         }
                         $scope.searcharc();
+                    }
+                    $scope.showDialog = function($id, $sid) {
+                        $scope.wallet = wallet;
+                        $scope.time = 1;
+                        $.each($scope.result.found, function(index, value) {
+                            if ($scope.result.found[index].UID == $sid) {
+                                $scope.Suser = $scope.result.found[index];
+                            }
+                        });
+                        $($id).fadeIn();
                     }
                     $scope.searcharc = function() {
                         sellect = $scope.find;
@@ -433,15 +442,21 @@ if (isset($_GET['logout'])) {
                     <div class="row"  >
                         <div class="container">
                             <div id='reqs' class="dialogbox well">
-                                <h3>Selected Helpers Name</h3>
-                                <p>Name</p>
-                                <div class="form-group">
-                                    <label for="email">Helping Time Period</label>
+                                <div style="display: inline-block;width: 100%;">
+                                    <h4 class="float-left ng-binding">Helper's Name : {{Suser.Uname}}</h4>
+                                    <h4 class="float-right ng-binding">Per Hour Cost : ${{Suser.Uperhour}}</h4>
+                                </div>
+                                <hr>
+                                <h4 class="float-right ng-binding">Your Wallet : ${{wallet}}</h4>
+                                <div class="form-group" style="margin-bottom: 0px">
+                                    <h4 for="email">Helping Time Period</h4>
                                     <input type="number" name="username" class="form-control simple" id="user" ng-model="time" autocomplete="off">
                                 </div>
+                                <h4 class="float-right ng-binding">Your Total Amount : ${{Suser.Uperhour*time}}</h4><br>
+                                <h4 class="float-right ng-binding">Your Balance : ${{wallet-(Suser.Uperhour*time)}}</h4><br>
                                 <div style="text-align: right">
                                     <input type="button" id="loginbtn" name="login" class="simple" value="Close" onClick="hideDialog('#reqs')">
-                                    <input type="button" id="loginbtn" name="login" class="simple" value="Login">
+                                    <input type="button" id="loginbtn" name="login" class="simple" value="Ask For Help">
                                 </div>
                             </div>
                             <div class="col-md-4" ng-repeat="x in result.found" >
@@ -456,7 +471,7 @@ if (isset($_GET['logout'])) {
                                         <ul style="padding-left: 15px;">
                                             <li ng-repeat="y in x.Skills">{{y.Sname}}</li>
                                         </ul>
-                                        <a href="#" style="width:100%" class="" onClick="showDialog('#reqs')">Request</a>
+                                        <a href="#" style="width:100%" class="" ng-click="showDialog('#reqs', x.UID)">Request</a>
                                     </figcaption>
                                 </figure>
 
