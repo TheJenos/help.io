@@ -112,6 +112,12 @@ if (isset($_GET['logout'])) {
                 right: 9px;
                 background: #141414;
             }
+            .snip1336 .perhour {
+                position: absolute;
+                top: 0px;
+                left: 9px;
+                background: #141414;
+            }
             .snip1336 * {
                 -webkit-box-sizing: border-box;
                 box-sizing: border-box;
@@ -308,9 +314,13 @@ if (isset($_GET['logout'])) {
                         if (sellect == "skill" && e.which == 13) {
                             var chip = '<div class="chip" value="' + $scope.searchtxt + '">' + $scope.searchtxt + '<i class="fa fa-times" onclick="$(this).parent().remove()"></i></div>';
                             $('#chiparea').html($('#chiparea').html() + chip);
-                            $scope.searchtxt="";
-                            $scope.searcharc();
+                            $scope.searchtxt = "";
                         }
+                        if (e.which == 8 && $scope.searchtxt.length < 1) {
+                            var chips = $('.chip');
+                            chips[chips.length - 1].remove();
+                        }
+                        $scope.searcharc();
                     }
                     $scope.searcharc = function() {
                         sellect = $scope.find;
@@ -423,6 +433,8 @@ if (isset($_GET['logout'])) {
                     <div class="row"  >
                         <div class="container">
                             <div id='reqs' class="dialogbox well">
+                                <h3>Selected Helpers Name</h3>
+                                <p>Name</p>
                                 <div class="form-group">
                                     <label for="email">Helping Time Period</label>
                                     <input type="number" name="username" class="form-control simple" id="user" ng-model="time" autocomplete="off">
@@ -436,6 +448,7 @@ if (isset($_GET['logout'])) {
                                 <figure class="snip1336" >
                                     <img ng-src="<?php echo $hostname; ?>{{x.Ubgimage}}" alt="sample87" />
                                     <b class="simple lastonline" >{{x.Ulastonline}}</b>
+                                    <b class="simple perhour" >${{x.Uperhour}} Per Hour </b>
                                     <figcaption>
                                         <img ng-src="<?php echo $hostname; ?>{{x.Upic}}" width="64" alt="profile-sample4" class="profile" />
                                         <h2>{{x.Uname}}({{x.Rate}})<span>{{x.Jname}}<br></span></h2>
@@ -459,6 +472,7 @@ if (isset($_GET['logout'])) {
                                 <figure class="snip1336">
                                     <img ng-src="<?php echo $hostname; ?>{{User.Ubgimage}}" alt="sample87" />
                                     <b class="simple lastonline" >{{User.Ulastonline}}</b>
+                                    <b class="simple perhour" >${{User.Uperhour}} Per Hour </b>
                                     <figcaption>
                                         <img ng-src="<?php echo $hostname; ?>{{User.Upic}}" width="64" alt="profile-sample4" class="profile" />
                                         <h2>{{User.Uname}}({{User.Rate}})<span>{{User.Jname}}</span></h2>
