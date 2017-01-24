@@ -40,6 +40,13 @@ function online() {
     }
 }
 
+function requestforhealp(){
+    $resquest= array(
+        
+    );
+    Insert("helprequest", $resquest);
+}
+
 function searchHealper() {
     if (isset($_POST['search']) && $_POST['search'] != "") {
         if ($_POST['find'] == "job") {

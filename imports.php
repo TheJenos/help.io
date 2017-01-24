@@ -1,5 +1,5 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#141414">
+<meta name="theme-color" content="#1a4c7f">
 <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
 <script src="js/jquery-3.1.1.min.js" type="text/javascript"></script>
 <script src="js/bootstrap.js" type="text/javascript"></script>
@@ -8,7 +8,7 @@
 <script src="js/angular.min.js" type="text/javascript"></script>
 <link rel="stylesheet" type="text/css" href="css/freelancer.min.css">
 <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
-<link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css">
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Noto+Sans:400,400italic,700,700italic">
 <link href="http://fontawesome.io/assets/font-awesome/css/font-awesome.css" rel="stylesheet" type="text/css">
 <style>
     @keyframes loader {
@@ -44,8 +44,8 @@
     }
     .simple{
         padding: 5px;
-        border: 1px solid #ffffff;
-        color: #ffffff;
+        border: 1px solid #00365a;
+        color: #00365a;
         font-size: 0.7em;
         text-transform: none !important;
         margin: 10px 0;
@@ -68,7 +68,7 @@
         -webkit-box-shadow: none;
     }
     hr{
-        color: white;
+        color: #00365a;
         height: 1px;
         margin: 6px 0px;
     }
@@ -84,35 +84,35 @@
         opacity: 1;
     }
     .well{
-        color: white;
+        color: #00365a;
         border: 0px; 
-        background: #141414;
+        background: #1a4c7f;
         /*box-shadow: 0px 0px 5px black;*/
         border-radius: 0px;
     }
     h1 {
         letter-spacing: 5px;
         text-transform: none !important;
-        font: 40px "Lato", sans-serif;
-        color: #ffffff;
+        font: 40px "Noto Sans", Arial;
+        color: #00365a;
     }
     h2 {
         letter-spacing: 5px;
         text-transform: none !important;
-        font: 25px "Lato", sans-serif;
-        color: #ffffff;
+        font: 25px "Noto Sans", Arial;
+        color: #00365a;
     }
     h3 {
         letter-spacing: 5px;
         text-transform: none !important;
-        font: 20px "Lato", sans-serif;
+        font: 20px "Noto Sans", Arial;
         color: #111;
     }
     label {
         letter-spacing: 5px;
         text-transform: none !important;
-        font: 10px "Lato", sans-serif;
-        color: white;
+        font: 10px "Noto Sans", Arial;
+        color: #00365a;
     }
     a{
         letter-spacing: 3px;
@@ -122,7 +122,7 @@
         text-transform: none !important;
     }
     .well h1,.well h2,.well h3,.well h4{
-        color: white;
+        color: #00365a;
         margin: 0px;
 
     }
@@ -135,13 +135,13 @@
         margin-left: 40px !important;
     }
     .table-hover tbody tr:hover{
-        color: #141414;
+        color: #1a4c7f;
     }
     .dropdown-menu {
-        background-color: #141414;
+        background-color: white;
     }
     .navbar-custom .navbar-nav li ul li a:hover{
-        color: #141414;
+        color: #1a4c7f;
     }
     /* Base for label styling */
     [type="checkbox"]:not(:checked),
@@ -164,7 +164,7 @@
         position: absolute;
         left:0; top: 1px;
         width: 23px; height: 23px;
-        border: 1px solid white;
+        border: 1px solid #00365a;
         box-shadow: inset 0 1px 3px rgba(0,0,0,.1);
     }
     /* checked mark aspect */
@@ -175,7 +175,7 @@
         top: 4px; left: 4px;
         font-size: 19px;
         line-height: 0.8;
-        color: white;
+        color: #00365a;
         transition: all .2s;
     }
     /* checked mark aspect changes */
@@ -208,7 +208,7 @@
 
     /* hover style just for information */
     label:hover:before {
-        border: 1px solid white!important;
+        border: 1px solid #00365a!important;
     }
     /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
     [type="radio"]:not(:checked),
@@ -231,7 +231,7 @@
         position: absolute;
         left:0; top: 1px;
         width: 23px; height: 23px;
-        border: 1px solid white;
+        border: 1px solid #00365a;
         box-shadow: inset 0 1px 3px rgba(0,0,0,.1);
     }
     /* checked mark aspect */
@@ -242,7 +242,7 @@
         top: 1px; left: 4px;
         font-size: 25px;
         line-height: 0.8;
-        color: white;
+        color: #00365a;
         transition: all .2s;
     }
     /* checked mark aspect changes */
@@ -275,7 +275,7 @@
 
     /* hover style just for information */
     label:hover:before {
-        border: 1px solid white!important;
+        border: 1px solid #00365a!important;
     }
     .dialogbox{
         position: fixed;
@@ -315,7 +315,7 @@
         outline: 0;
         margin: 0;
         padding: 0 !important;
-        color: white;
+        color: #00365a;
         width: 120px !important;
     }
     .chip {
@@ -326,23 +326,23 @@
         color: rgba(0,0,0,0.6);
         line-height: 32px;
         padding: 0 12px;
-        border: 1px solid white;
-        color: white;
+        border: 1px solid #00365a;
+        color: #00365a;
         margin-bottom: 5px;
         margin-right: 5px;
     }
     @media (max-width: 767px) {
         .navbar-default .navbar-nav .open .dropdown-menu>li>a {
-            color: white; 
+            color: #00365a; 
         }
         .navbar-default .navbar-nav .open .dropdown-menu>li>a:focus, .navbar-default .navbar-nav .open .dropdown-menu>li>a:hover {
-            color: #141414;
+            color: #1a4c7f;
             background-color: white;
         }
         .dialogbox{
             position: fixed;
             top: 5%;
-            left: 5%;
+            left: 2%;
             width: 90%;
             z-index: 99999;
             text-align: left;

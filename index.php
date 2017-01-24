@@ -40,33 +40,43 @@ if (isset($_GET['logout'])) {
             }
 
             body{
-                background: #141414;
-                font: "Lato", sans-serif;
+                background: white;
+                color: #00365a;
+                font: "Noto Sans", Arial;
+            }
+            p,i,b{
+                color: #00365a;
+            }
+            p {
+                font-size: 16px;
             }
             .cusname:after{
                 content: ".IO";
+                color: #00365a;
                 animation: blink-animation 1s infinite;
                 -webkit-animation: blink-animation 1s infinite;
                 animation-direction: alternate;
             }
             .well{
-                color: white;
+                color: #00365a;
                 border: 0px; 
-                background: #141414;
+                background: white;
                 /*box-shadow: 0px 0px 5px black;*/
                 border-radius: 0px;
+                border-radius: 5px;
             }
             .navbar-custom{
-                background: #141414;
+                background: white;
             }
             .footer .footer-above{
-                background: #141414;
+                background: white;
             }
             .footer h1,.footer h2,.footer h3,.footer h4{
-                color:white;
+                color:#00365a;
             }
             .footer .footer-below{
-                background: #0e0e0e;
+                background: #faf3f3;
+                color:#00365a;
             }
             .parallax1 {
                 content: "";
@@ -81,10 +91,18 @@ if (isset($_GET['logout'])) {
 
             }
             .box-h3{
-                background-color: #141414;
+                background-color: white;
+                padding: 20px;
+                width: fit-content;
+                color:#00365a;
+                border-radius: 5px;
+            }
+            .txtarea .box-h3{
+                background-color:#82b0e1;
                 padding: 20px;
                 width: fit-content;
                 color:white;
+                font-size: 17px;
             }
             .parallax {
                 background-image: url("images/bg/<?php echo randImages(); ?>");
@@ -95,28 +113,28 @@ if (isset($_GET['logout'])) {
                 background-size: cover;
             }
             .snip1336 {
+                border-radius: 5px;
                 position: relative;
-                margin-top: 10px;
-                font-family: 'Roboto', Arial, sans-serif;
+                font-family: 'Roboto', Arial, Arial;
                 overflow: hidden;
                 min-width: 230px;
                 width: 100%;
-                color: #ffffff;
+                color: #00365a;
                 text-align: left;
                 line-height: 1.4em;
-                background-color: #141414;
+                background-color: white;
             }
             .snip1336 .lastonline {
                 position: absolute;
                 top: 0px;
                 right: 9px;
-                background: #141414;
+                background: white;
             }
             .snip1336 .perhour {
                 position: absolute;
                 top: 0px;
                 left: 9px;
-                background: #141414;
+                background: white;
             }
             .snip1336 * {
                 -webkit-box-sizing: border-box;
@@ -131,7 +149,7 @@ if (isset($_GET['logout'])) {
             }
             .snip1336 figcaption {
                 width: 100%;
-                background-color: #141414;
+                background-color: white;
                 padding: 25px;
                 position: relative;
             }
@@ -144,12 +162,12 @@ if (isset($_GET['logout'])) {
                 height: 0;
                 border-style: solid;
                 border-width: 55px 0 0 400px;
-                border-color: transparent transparent transparent #141414;
+                border-color: transparent transparent transparent white;
             }
             .snip1336 figcaption a {
                 padding: 5px;
-                border: 1px solid #ffffff;
-                color: #ffffff;
+                border: 1px solid #00365a;
+                color: #00365a;
                 font-size: 0.7em;
                 text-transform: uppercase !important;
                 margin: 10px 0;
@@ -159,7 +177,7 @@ if (isset($_GET['logout'])) {
                 text-align: center;
                 text-decoration: none;
                 font-weight: 600;
-                letter-spacing: 5px;
+                letter-spacing: 2px;
             }
             .snip1336 figcaption a:hover {
                 opacity: 1;
@@ -190,37 +208,43 @@ if (isset($_GET['logout'])) {
             }
             .snip1336 p {
                 margin: 0 0 10px;
-                font-size: 0.8em;
+                font-size: 13px;
                 letter-spacing: 1px;
                 opacity: 0.8;
             }
             .page-scroll a{
-                font: 14px "Lato", sans-serif;
+                font: 14px "Noto Sans", Arial;
             }
 
             h1 {
-                letter-spacing: 5px;
+                letter-spacing: 2px;
                 text-transform: none !important;
-                font: 40px "Lato", sans-serif;
-                color: #ffffff;
+                font: 40px "Noto Sans", Arial;
+                color: #00365a;
             }
             h2 {
-                letter-spacing: 5px;
+                letter-spacing: 2px;
                 text-transform: none !important;
-                font: 25px "Lato", sans-serif;
-                color: #ffffff;
+                font: 25px "Noto Sans", Arial;
+                color: #00365a;
             }
             h3 {
-                letter-spacing: 5px;
+                letter-spacing: 2px;
                 text-transform: none !important;
-                font: 20px "Lato", sans-serif;
-                color: #111;
+                font: 20px "Noto Sans", Arial;
+                color: #00365a;
             }
             .defs-only {
                 position: absolute;
                 height: 0; width: 0;
                 overflow: none;
                 left: -100%;
+            }
+            .btn-social{
+                border: 2px solid #00365a;
+            }
+            .navbar-custom .navbar-brand, .navbar-custom .navbar-brand.active, .navbar-custom .navbar-brand:active, .navbar-custom .navbar-brand:focus, .navbar-custom .navbar-brand:hover, .navbar-custom .navbar-nav li a, header{
+                color: #00365a;
             }
         </style>
         <script type="text/javascript">
@@ -331,6 +355,21 @@ if (isset($_GET['logout'])) {
                         });
                         $($id).fadeIn();
                     }
+                    $scope.sendrequest = function() {
+                        hideDialog("#reqs");
+                        $.post("backend.php", {
+                            "uname": "<?php echo $_SESSION['userdata']['Uemail']; ?>",
+                            "upass": "<?php echo $_SESSION['userdata']['Upass']; ?>",
+                            "want": "requestforhealp",
+                            "json": true
+                        }).done(function(response) {
+                            var result = $.parseJSON(response);
+                            if (result.status == "Fail") {
+                                showError(result.msg);
+                            }
+                        });
+
+                    }
                     $scope.searcharc = function() {
                         sellect = $scope.find;
                         $.post("backend.php", {
@@ -358,23 +397,20 @@ if (isset($_GET['logout'])) {
     </head>
     <body ng-app="home" >
         <div class="parallax">
-            <nav id="mainNav" style="border-radius:0px;margin-bottom: 50px;" class="navbar navbar-default  navbar-custom affix-top">
+            <nav id="mainNav" style="border-radius:0px;margin-bottom: 50px;padding: 0px" class="navbar navbar-default  navbar-custom affix-top">
                 <div class="container">
                     <!-- Brand and toggle get grouped for better mobile display -->
                     <div class="navbar-header page-scroll">
-                        <button style="margin-top: 15px;" type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-                            <span class="sr-only">Toggle navigation</span><i class="glyphicon glyphicon-menu-down"></i>
+                        <button style="margin-top: 15px;border-color: #00365a" type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                            <span class="sr-only">Toggle navigation</span><i style="" class="glyphicon glyphicon-menu-down"></i>
                         </button>
-                        <a class="navbar-brand" href="index.php" style="padding: 5px;height: auto;"><h1 class="cusname" style="margin: 5px;color: white">HELP</h1></a>
+                        <a class="navbar-brand" href="index.php" style="padding: 5px;height: auto;"><h1 class="cusname" style="margin: 5px;color: #00365a">HELP</h1></a>
                     </div>
                     <!-- Collect the nav links, forms, and other content for toggling -->
                     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1" ng-controller="trans">
-                        <ul class="nav navbar-nav navbar-right">
+                        <ul class="nav navbar-nav navbar-right" style="margin: 7.5px -15px;">
                             <li class="hidden active">
                                 <a href="#page-top"></a>
-                            </li>
-                            <li class="page-scroll">
-                                <a href="#">Phones</a>
                             </li>
                             <li class="page-scroll">
                                 <?php if (isset($_SESSION['userdata'])) { ?>
@@ -382,7 +418,7 @@ if (isset($_GET['logout'])) {
                                 </li>
                                 <li class="page-scroll">
                                 <li class="dropdown">
-                                    <a href="#" style="font: 14px 'Lato', sans-serif;" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                                    <a href="#" style="font: 14px 'Lato', Arial;" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
                                         Profile 
                                         <?php if ($_SESSION['userdata']['Ustatus'] == "Online") { ?>
                                             <i class="fa fa-user-circle-o" aria-hidden="true"></i>
@@ -440,8 +476,8 @@ if (isset($_GET['logout'])) {
                         </p>
                     </h3>
                     <div class="row"  >
-                        <div class="container">
-                            <div id='reqs' class="dialogbox well">
+                        <div class="container" style="min-height: 548px;">
+                            <div id='reqs' class="dialogbox well" style="background: #007eff;">
                                 <div style="display: inline-block;width: 100%;">
                                     <h4 class="float-left ng-binding">Helper's Name : {{Suser.Uname}}</h4>
                                     <h4 class="float-right ng-binding">Per Hour Cost : ${{Suser.Uperhour}}</h4>
@@ -452,11 +488,11 @@ if (isset($_GET['logout'])) {
                                     <h4 for="email">Helping Time Period</h4>
                                     <input type="number" name="username" class="form-control simple" id="user" ng-model="time" autocomplete="off">
                                 </div>
-                                <h4 class="float-right ng-binding">Your Total Amount : ${{Suser.Uperhour*time}}</h4><br>
-                                <h4 class="float-right ng-binding">Your Balance : ${{wallet-(Suser.Uperhour*time)}}</h4><br>
+                                <h4 class="float-right ng-binding">Your Total Amount : ${{Suser.Uperhour * time}}</h4><br>
+                                <h4 class="float-right ng-binding">Your Balance : ${{wallet - (Suser.Uperhour * time)}}</h4><br>
                                 <div style="text-align: right">
                                     <input type="button" id="loginbtn" name="login" class="simple" value="Close" onClick="hideDialog('#reqs')">
-                                    <input type="button" id="loginbtn" name="login" class="simple" value="Ask For Help">
+                                    <input type="button" id="loginbtn" ng-show="(wallet - (Suser.Uperhour * time)) > 0 && time > 0" ng-click="sendrequest()" name="login" class="simple" value="Ask For Help">
                                 </div>
                             </div>
                             <div class="col-md-4" ng-repeat="x in result.found" >
@@ -471,7 +507,7 @@ if (isset($_GET['logout'])) {
                                         <ul style="padding-left: 15px;">
                                             <li ng-repeat="y in x.Skills">{{y.Sname}}</li>
                                         </ul>
-                                        <a href="#" style="width:100%" class="" ng-click="showDialog('#reqs', x.UID)">Request</a>
+                                        <a href="#" style="width:100%" class="" ng-show="x.Ulastonline == 'Online Now'" ng-click="showDialog('#reqs', x.UID)">Request</a>
                                     </figcaption>
                                 </figure>
 
@@ -538,7 +574,7 @@ if (isset($_GET['logout'])) {
 
                 </center>
             </div>
-            <div style="color: #777;background-color:white;text-align:center;padding:50px 80px;text-align: justify;">
+            <div class="txtarea" style="color: #777;background-color:white;text-align:center;padding:50px 80px;text-align: justify;">
                 <p>
                     Volunteering your time, money, or energy to help others doesn’t just make the world better—it also makes you better. Studies indicate that the very act of giving back to the community boosts your happiness, health, and sense of well-being. Here are seven scientific benefits of lending a hand to those in need. 
                 </p>
