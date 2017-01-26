@@ -248,9 +248,16 @@ if (isset($_GET['logout'])) {
             }
         </style>
         <script type="text/javascript">
+            window.onclick = function(event) {
+                var modal = document.getElementById('reqs');
+                if (event.target == modal) {
+                    $("#reqs").fadeOut();
+                }
+            }
             var app = angular.module("home", []);
             var sellect = "skill";
             var wallet = 0;
+            var User;
             function showError($txt) {
                 $('#error').fadeIn('fast');
                 $('#error').html($txt);
@@ -287,6 +294,7 @@ if (isset($_GET['logout'])) {
                 app.controller("userinfo", function($scope, $interval) {
                     var datas = '<?php echo json_encode($_SESSION['userdata']); ?>';
                     $scope.User = $.parseJSON(datas);
+                    User = $scope.User;
                     $scope.User.Ulastonline = "Wait A Movement";
                     $interval(function() {
                         $.post("backend.php", {
@@ -301,8 +309,16 @@ if (isset($_GET['logout'])) {
                             }
                             result.user.Ulastonline = ($.timeago(result.user.Ulastonline) == "Online ago") ? (result.user.Ustatus == "Online") ? "Online Now" : "Online But Away" : "Last Online " + $.timeago(result.user.Ulastonline);
                             $scope.User = result.user;
+                            User = $scope.User;
                         });
                     }, 5000);
+                });
+                app.controller("help", function($scope, $interval) {
+                    $interval(function() {
+                        if(User.Ustatus == "Busy"){
+                            showError("I am Busy Now");
+                        }
+                    }, 1000);
                 });
                 app.controller("trans", function($scope, $interval) {
                     $interval(function() {
@@ -327,72 +343,77 @@ if (isset($_GET['logout'])) {
                         });
                     }, 1000);
                 });
-                app.controller("search", function($scope) {
-                    $scope.find = "skill";
-                    $scope.$watch('find', function(value) {
-                        $('#chiparea').html("");
-                        $scope.searcharc();
-                    });
-                    $scope.runScript = function(txt, e) {
-                        if (sellect == "skill" && e.which == 13) {
-                            var chip = '<div class="chip" value="' + $scope.searchtxt + '">' + $scope.searchtxt + '<i class="fa fa-times" onclick="$(this).parent().remove()"></i></div>';
-                            $('#chiparea').html($('#chiparea').html() + chip);
-                            $scope.searchtxt = "";
-                        }
-                        if (e.which == 8 && $scope.searchtxt.length < 1) {
-                            var chips = $('.chip');
-                            chips[chips.length - 1].remove();
-                        }
-                        $scope.searcharc();
-                    }
-                    $scope.showDialog = function($id, $sid) {
-                        $scope.wallet = wallet;
-                        $scope.time = 1;
-                        $.each($scope.result.found, function(index, value) {
-                            if ($scope.result.found[index].UID == $sid) {
-                                $scope.Suser = $scope.result.found[index];
-                            }
-                        });
-                        $($id).fadeIn();
-                    }
-                    $scope.sendrequest = function() {
-                        hideDialog("#reqs");
-                        $.post("backend.php", {
-                            "uname": "<?php echo $_SESSION['userdata']['Uemail']; ?>",
-                            "upass": "<?php echo $_SESSION['userdata']['Upass']; ?>",
-                            "want": "requestforhealp",
-                            "json": true
-                        }).done(function(response) {
-                            var result = $.parseJSON(response);
-                            if (result.status == "Fail") {
-                                showError(result.msg);
-                            }
-                        });
-
-                    }
-                    $scope.searcharc = function() {
-                        sellect = $scope.find;
-                        $.post("backend.php", {
-                            "uname": "<?php echo $_SESSION['userdata']['Uemail']; ?>",
-                            "upass": "<?php echo $_SESSION['userdata']['Upass']; ?>",
-                            "want": "searchHealper",
-                            "search": ($scope.find == "skill") ? getchips() : $scope.searchtxt,
-                            "find": $scope.find,
-                            "json": true
-                        }).done(function(response) {
-                            var result = $.parseJSON(response);
-                            if (result.status == "Fail") {
-                                showError(result.msg);
-                            }
-                            $.each(result.found, function(index, value) {
-                                value.Ulastonline = ($.timeago(value.Ulastonline) == "Online ago") ? (value.Ustatus == "Online") ? "Online Now" : "Online But Away" : "Last Online " + $.timeago(value.Ulastonline);
-                            });
-                            $scope.result = result;
-                        });
-                    };
-                });
-
 <?php } ?>
+            app.controller("search", function($scope, $interval) {
+                $scope.find = "skill";
+                $scope.rand = "skill";
+                $scope.$watch('find', function(value) {
+                    $('#chiparea').html("");
+                    $scope.searcharc();
+                });
+                $scope.runScript = function(txt, e) {
+                    if (sellect == "skill" && e.which == 13) {
+                        var chip = '<div class="chip" value="' + $scope.searchtxt + '">' + $scope.searchtxt + '<i class="fa fa-times" onclick="$(this).parent().remove()"></i></div>';
+                        $('#chiparea').html($('#chiparea').html() + chip);
+                        $scope.searchtxt = "";
+                    }
+                    if (e.which == 8 && $scope.searchtxt.length < 1) {
+                        var chips = $('.chip');
+                        chips[chips.length - 1].remove();
+                    }
+                    $scope.searcharc();
+                }
+                $scope.showDialog = function($id, $sid) {
+                    $scope.wallet = wallet;
+                    $scope.time = 1;
+                    $.each($scope.result.found, function(index, value) {
+                        if ($scope.result.found[index].UID == $sid) {
+                            $scope.Suser = $scope.result.found[index];
+                        }
+                    });
+                    $($id).fadeIn();
+                }
+                $scope.sendrequest = function() {
+                    $.post("backend.php", {
+                        "uname": "<?php echo isset($_SESSION['userdata']) ? $_SESSION['userdata']['Uemail'] : "tmp"; ?>",
+                        "upass": "<?php echo isset($_SESSION['userdata']) ? $_SESSION['userdata']['Upass'] : "tmp"; ?>",
+                        "want": "requestforhealp",
+                        "who": $scope.Suser.UID,
+                        "json": true
+                    }).done(function(response) {
+                        var result = $.parseJSON(response);
+                        if (result.status == "Fail") {
+                            showError(result.msg);
+                        }
+                        hideDialog("#reqs");
+                    });
+                }
+                $interval(function() {
+                    $scope.rand = Math.random();
+                }, 100);
+                $scope.searcharc = function() {
+                    sellect = $scope.find;
+                    $.post("backend.php", {
+                        "uname": "<?php echo isset($_SESSION['userdata']) ? $_SESSION['userdata']['Uemail'] : "tmp"; ?>",
+                        "upass": "<?php echo isset($_SESSION['userdata']) ? $_SESSION['userdata']['Upass'] : "tmp"; ?>",
+                        "want": "searchHealper",
+                        "search": ($scope.find == "skill") ? getchips() : $scope.searchtxt,
+                        "find": $scope.find,
+                        "json": true
+                    }).done(function(response) {
+                        var result = $.parseJSON(response);
+                        if (result.status == "Fail") {
+                            showError(result.msg);
+                        }
+                        $.each(result.found, function(index, value) {
+                            value.Ulastonline = ($.timeago(value.Ulastonline) == "Online ago") ? (value.Ustatus == "Online") ? "Online Now" : "Online But Away" : "Last Online " + $.timeago(value.Ulastonline);
+                        });
+                        //alert(result.found.length);
+                        $scope.result = result;
+                    });
+                };
+            });
+
         </script>
     </head>
     <body ng-app="home" >
@@ -407,16 +428,16 @@ if (isset($_GET['logout'])) {
                         <a class="navbar-brand" href="index.php" style="padding: 5px;height: auto;"><h1 class="cusname" style="margin: 5px;color: #00365a">HELP</h1></a>
                     </div>
                     <!-- Collect the nav links, forms, and other content for toggling -->
-                    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1" ng-controller="trans">
+                    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1" >
                         <ul class="nav navbar-nav navbar-right" style="margin: 7.5px -15px;">
                             <li class="hidden active">
                                 <a href="#page-top"></a>
                             </li>
                             <li class="page-scroll">
+                                <a href="?helpers">Helpers</a>
+                            </li>
+                            <li class="page-scroll">
                                 <?php if (isset($_SESSION['userdata'])) { ?>
-                                    <a href="?helpers">Helpers</a>
-                                </li>
-                                <li class="page-scroll">
                                 <li class="dropdown">
                                     <a href="#" style="font: 14px 'Lato', Arial;" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
                                         Profile 
@@ -429,7 +450,7 @@ if (isset($_GET['logout'])) {
                                         <?php } ?>
                                         <span class="caret"></span>
                                     </a>
-                                    <ul class="dropdown-menu">
+                                    <ul class="dropdown-menu" ng-controller="trans">
                                         <li><a href="#">My Wallet : ${{result.Wallet}}</a></li>
                                         <li><a href="#">Transections Count : {{result.Count}}</a></li>
                                         <li><a href="#">Status : <?php echo $_SESSION['userdata']['Ustatus']; ?></a></li>
@@ -458,7 +479,7 @@ if (isset($_GET['logout'])) {
             <div class="container">
                 <div class="alert alert-danger" id="error"></div>
             </div>
-            <?php if (isset($_SESSION['userdata']) && isset($_GET['helpers'])) { ?>
+            <?php if (isset($_GET['helpers'])) { ?>
                 <center ng-controller="search">
                     <h3 style="text-align:left;margin-bottom: 40px;width: 90%" class="box-h3">
                         Search
@@ -477,24 +498,57 @@ if (isset($_GET['logout'])) {
                     </h3>
                     <div class="row"  >
                         <div class="container" style="min-height: 548px;">
-                            <div id='reqs' class="dialogbox well" style="background: #007eff;">
-                                <div style="display: inline-block;width: 100%;">
-                                    <h4 class="float-left ng-binding">Helper's Name : {{Suser.Uname}}</h4>
-                                    <h4 class="float-right ng-binding">Per Hour Cost : ${{Suser.Uperhour}}</h4>
+                            <?php if (isset($_SESSION['userdata'])) { ?> 
+                                <div id='reqs' class="dialogbox">
+                                    <div class="well">
+                                        <div style="display: inline-block;width: 100%;">
+                                            <h4 class="float-left ng-binding">Helper's Name : {{Suser.Uname}}</h4>
+                                            <h4 class="float-right ng-binding">Per Hour Cost : ${{Suser.Uperhour}}</h4>
+                                        </div>
+                                        <hr>
+                                        <h4 class="float-right ng-binding">Your Wallet : ${{wallet}}</h4>
+                                        <div class="form-group" style="margin-bottom: 0px">
+                                            <h4 for="email">Helping Time Period</h4>
+                                            <input type="number" name="username" class="form-control simple" id="user" ng-model="time" autocomplete="off">
+                                        </div>
+                                        <h4 class="float-right ng-binding">Your Total Amount : ${{Suser.Uperhour * time}}</h4><br>
+                                        <h4 class="float-right ng-binding">Your Balance : ${{wallet - (Suser.Uperhour * time)}}</h4><br>
+                                        <div style="text-align: right">
+                                            <input type="button" id="loginbtn" name="login" class="simple" value="Close" onClick="hideDialog('#reqs')">
+                                            <input type="button" id="loginbtn" ng-show="(wallet - (Suser.Uperhour * time)) > 0 && time > 0" ng-click="sendrequest()" name="login" class="simple" value="Ask For Help">
+                                        </div>
+                                    </div>
                                 </div>
-                                <hr>
-                                <h4 class="float-right ng-binding">Your Wallet : ${{wallet}}</h4>
-                                <div class="form-group" style="margin-bottom: 0px">
-                                    <h4 for="email">Helping Time Period</h4>
-                                    <input type="number" name="username" class="form-control simple" id="user" ng-model="time" autocomplete="off">
+                            <?php } else { ?>
+                                <div id='reqs' class="dialogbox">
+                                    <div class="well row">
+                                        <center>
+                                            <h2 class="col-lg-5" style="margin-top: 45px;">Please Create A Account 
+                                                </br> Or 
+                                                </br> Sign Up 
+                                            </h2>
+                                            <form class="col-lg-7" style="border-left: 1px solid #00365a;text-align: left;" role="form" id="myform" action="backend.php" method="POST" novalidate="" >
+                                                <div class="form-group">
+                                                    <label for="email">Username or Email</label>
+                                                    <input type="text" name="username" class="form-control simple" id="user" ng-model="username" autocomplete="off">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="pwd">Password</label>
+                                                    <input type="password" name="pass" class="form-control simple" id="pass" ng-model="pass" autocomplete="off">
+                                                </div>
+                                                <div class="checkbox">
+                                                    <p>
+                                                        <input name="re" type="checkbox" id="test1"><label for="test1"> Remember me</label>
+                                                    </p>
+                                                </div>
+                                                <div style="text-align: right">
+                                                    <input type="button" id="loginbtn" name="login" class="simple" value="Login">
+                                                </div>
+                                            </form>
+                                        </center>
+                                    </div>
                                 </div>
-                                <h4 class="float-right ng-binding">Your Total Amount : ${{Suser.Uperhour * time}}</h4><br>
-                                <h4 class="float-right ng-binding">Your Balance : ${{wallet - (Suser.Uperhour * time)}}</h4><br>
-                                <div style="text-align: right">
-                                    <input type="button" id="loginbtn" name="login" class="simple" value="Close" onClick="hideDialog('#reqs')">
-                                    <input type="button" id="loginbtn" ng-show="(wallet - (Suser.Uperhour * time)) > 0 && time > 0" ng-click="sendrequest()" name="login" class="simple" value="Ask For Help">
-                                </div>
-                            </div>
+                            <?php } ?>
                             <div class="col-md-4" ng-repeat="x in result.found" >
                                 <figure class="snip1336" >
                                     <img ng-src="<?php echo $hostname; ?>{{x.Ubgimage}}" alt="sample87" />
@@ -570,11 +624,11 @@ if (isset($_GET['logout'])) {
                 </div>
             <?php } else { ?>
                 <center>
-                    <h3 class="box-h3" style="padding:20px;margin: 20%"><?php echo randQuotes(); ?></h3>
+                    <h3 class="box-h3" style="padding:20px;margin: 10%"><?php echo randQuotes(); ?></h3>
 
                 </center>
             </div>
-            <div class="txtarea" style="color: #777;background-color:white;text-align:center;padding:50px 80px;text-align: justify;">
+            <div class="txtarea" style="">
                 <p>
                     Volunteering your time, money, or energy to help others doesn’t just make the world better—it also makes you better. Studies indicate that the very act of giving back to the community boosts your happiness, health, and sense of well-being. Here are seven scientific benefits of lending a hand to those in need. 
                 </p>

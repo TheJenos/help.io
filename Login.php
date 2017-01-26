@@ -72,7 +72,7 @@ if (isset($_SESSION['userdata'])) {
             <div class="col-md-4"></div>
             <div class="col-md-4">
                 <div class="alert alert-danger" id="error"></div>
-                <div class="well" style="margin: 5px;color: white;margin: 5px;">
+                <div class="well" style="margin: 5px;margin: 5px;background: #ffffff;">
                     <form role="form" id="myform" action="backend.php" method="POST" novalidate="" >
                         <div class="form-group">
                             <label for="email">Username or Email</label>

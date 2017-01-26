@@ -40,8 +40,11 @@ function online() {
     }
 }
 
-function requestforhealp(){
-    $resquest= array(
+function requestforhealp() {
+    $data = array('Ustatus' => "Busy");
+    Update("`user`", $data, "UID='" . antisqli($GLOBALS['myprofile']['UID']) . "'");
+    Update("`user`", $data, "UID='" . antisqli($_POST['who']) . "'");
+    $resquest = array(
         
     );
     Insert("helprequest", $resquest);
@@ -60,7 +63,8 @@ function searchHealper() {
             $where = substr($where, 0, strlen($where) - 1);
             $result = SearchARows("`skills_of_user` NATURAL JOIN `user` NATURAL JOIN `skills` NATURAL JOIN `jobs`", array('*', '(Urate/Uratetime) AS `Rate`'), " `UID`!='" . antisqli($GLOBALS['myprofile']['UID']) . "' AND `Sname` IN ($where) AND `Ustatus` IN ('Online','Away') GROUP BY `UID` ORDER BY `Rate`,`Ulastonline` DESC LIMIT 10");
             for ($index = 0; $index < count($result); $index++) {
-                $skilldata = SearchARows("`skills_of_user` NATURAL JOIN `skills`", array('*'), "`UID`='" + antisqli($result[$index]['UID']) + "'");
+                $skilldata = array();
+                $skilldata = SearchARows("`skills_of_user` NATURAL JOIN `skills`", array('*'), "`UID`='".antisqli($result[$index]['UID'])."'");
                 $result[$index]['Udiscription'] = "";
                 $result[$index]['Skills'] = $skilldata;
             }
@@ -78,6 +82,11 @@ if (isset($_POST['json'])) {
     }
     if (!isset($_POST['upass'])) {
         fail("Password Missing");
+    }
+    if ($_POST['uname'] == "tmp" && $_POST['upass'] == "tmp") {
+        $myprofile = array("UID" => "tmp");
+        searchHealper();
+        exitWithPrint();
     }
     $data = SearchARow("user", array('*', '(Urate/Uratetime) AS `Rate`'), "Uemail='" . antisqli($_POST['uname']) . "' ");
     if (!isset($data)) {

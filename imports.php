@@ -331,6 +331,16 @@
         margin-bottom: 5px;
         margin-right: 5px;
     }
+    .txtarea{
+        color: #777;
+        background-color: white;
+        text-align: center;
+        padding: 50px 80px;
+        text-align: justify;
+    }
+    .dropdown{
+        margin-top: 2px;
+    }
     @media (max-width: 767px) {
         .navbar-default .navbar-nav .open .dropdown-menu>li>a {
             color: #00365a; 
@@ -346,6 +356,13 @@
             width: 90%;
             z-index: 99999;
             text-align: left;
+        }
+        .txtarea{
+            color: #777;
+            background-color: white;
+            text-align: center;
+            padding: 50px 20px;
+            text-align: justify;
         }
     }
 </style>

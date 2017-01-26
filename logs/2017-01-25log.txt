@@ -1,0 +1,31 @@
+
+{"status":"Fail","msg":"Invalid Username"}
+SELECT *,(Urate/Uratetime) AS `Rate` FROM user WHERE Uemail='nadunnew@gmail.com' 
+{"status":"Fail","msg":"Invalid Username"}
+Connection Error
+SELECT *,(Urate/Uratetime) AS `Rate` FROM user WHERE Uemail='nadunnew@gmail.com' 
+{"status":"Fail","msg":"Invalid Username"}
+Connection Error
+SELECT *,(Urate/Uratetime) AS `Rate` FROM user WHERE Uemail='nadunnew@gmail.com' 
+{"status":"Fail","msg":"Invalid Username"}
+Connection Error
+SELECT *,(Urate/Uratetime) AS `Rate` FROM user WHERE Uemail='nadunnew@gmail.com' 
+{"status":"Fail","msg":"Invalid Username"}
+Connection Error
+SELECT *,(Urate/Uratetime) AS `Rate` FROM user WHERE Uemail='nadunnew@gmail.com' 
+{"status":"Fail","msg":"Invalid Username"}
+Connection Error
+SELECT *,(Urate/Uratetime) AS `Rate` FROM user WHERE Uemail='nadunnew@gmail.com' 
+{"status":"Fail","msg":"Invalid Username"}
+Connection Error
+SELECT *,(Urate/Uratetime) AS `Rate` FROM user WHERE Uemail='nadunnew@gmail.com' 
+{"status":"Fail","msg":"Invalid Username"}
+Connection Error
+SELECT *,(Urate/Uratetime) AS `Rate` FROM user WHERE Uemail='nadunnew@gmail.com' 
+{"status":"Fail","msg":"Invalid Username"}
+Connection Error
+SELECT *,(Urate/Uratetime) AS `Rate` FROM user WHERE Uemail='nadunnew@gmail.com' 
+{"status":"Fail","msg":"Invalid Username"}
+Connection Error
+SELECT *,(Urate/Uratetime) AS `Rate` FROM user WHERE Uemail='nadunnew@gmail.com' 
+{"status":"Fail","msg":"Invalid Username"}
