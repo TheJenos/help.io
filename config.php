@@ -35,6 +35,10 @@ function logit($param) {
     $newtxt = file_get_contents('logs/'.date("Y-m-d").$GLOBALS['logfile']) . "\n" . $param;
     file_put_contents('logs/'.date("Y-m-d").$GLOBALS['logfile'], $newtxt);
 }
+function mylogit($param) {
+    $newtxt = file_get_contents('logs/'.date("Y-m-d")."Mylog.txt") . "\n" . $param;
+    file_put_contents('logs/'.date("Y-m-d")."Mylog.txt", $newtxt);
+}
 
 function hostname() {
     echo $hostname;
@@ -135,6 +139,12 @@ function Insert($table, $data) {
     return mysqli_query($conn, $query);
 }
 
+function excquery($query){
+    $conn = $GLOBALS['con'];
+    logit($query);
+    return mysqli_query($conn, $query);
+}
+
 function Update($table, $data, $where) {
     $conn = $GLOBALS['con'];
     $cols = "";
@@ -155,6 +165,20 @@ function Delete($table, $where) {
     return mysqli_query($conn, $query);
 }
 
+function mySearchARow($table, $rows, $where) {
+    $con = $GLOBALS['con'];
+    $cols = "";
+    foreach ($rows as $key => $value) {
+        $cols .= "$value,";
+    }
+    $cols = substr($cols, 0, strlen($cols) - 1);
+    $query = "SELECT " . $cols . " FROM $table WHERE $where";
+    $result = mysqli_query($con, $query);
+    mylogit($query);
+    if (mysqli_num_rows($result) > 0) {
+        return mysqli_fetch_assoc($result);
+    }
+}
 function SearchARow($table, $rows, $where) {
     $con = $GLOBALS['con'];
     $cols = "";

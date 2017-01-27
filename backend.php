@@ -45,9 +45,31 @@ function requestforhealp() {
     Update("`user`", $data, "UID='" . antisqli($GLOBALS['myprofile']['UID']) . "'");
     Update("`user`", $data, "UID='" . antisqli($_POST['who']) . "'");
     $resquest = array(
-        
+        "Rfrom"=>$GLOBALS['myprofile']['UID'],
+        "Rto"=>$_POST['who'],
+        "Rlength"=>$_POST['time'],
     );
     Insert("helprequest", $resquest);
+}
+
+function gethelp() {
+    $sql = "DELETE FROM `helprequest` WHERE SUBTIME(NOW(),'0:05:00') > `Rdatetime` AND `Ranswer`='Waiting'";
+    excquery($sql);
+    $gethelpto = mySearchARow("`helprequest` JOIN `user` ON `helprequest`.`Rfrom` = `user`.`UID`", array('Rfrom', 'Rlength', 'Rdatetime', 'Ranswer', 'Rstarttime', 'UID', 'Uname','Upic','Ubgimage','Uperhour','(Urate/Uratetime) AS `Rate`'), "`Rto`='" . antisqli($GLOBALS['myprofile']['UID']) . "' AND `Rdatetime` > SUBTIME(NOW(),'0:05:00') AND `Ranswer`='Waiting' ORDER BY `Rdatetime` DESC");
+    $gethelpfrom = mySearchARow("`helprequest` JOIN `user` ON `helprequest`.`Rto` = `user`.`UID` ", array('Rto', 'Rlength', 'Rdatetime', 'Ranswer', 'Rstarttime', 'UID', 'Uname','Upic','Ubgimage','Uperhour','(Urate/Uratetime) AS `Rate`'), "`Rfrom`='" . antisqli($GLOBALS['myprofile']['UID']) . "' AND `Rdatetime` > SUBTIME(NOW(),'0:05:00') AND `Ranswer`='Waiting' ORDER BY `Rdatetime` DESC");
+    $data = null;
+    if (isset($gethelpto)) {
+        $GLOBALS['json']['type'] = "to me";
+        $data = $gethelpto;
+    } else if (isset($gethelpfrom)) {
+        $GLOBALS['json']['type'] = "from me";
+        $data = $gethelpfrom;
+    } else {
+        $data1 = array('Ustatus' => "Online");
+        Update("`user`", $data1, "UID='" . antisqli($GLOBALS['myprofile']['UID']) . "'");
+        fail("Resqest Expired");
+    }
+    $GLOBALS['json']['data'] = $data;
 }
 
 function searchHealper() {
@@ -64,7 +86,7 @@ function searchHealper() {
             $result = SearchARows("`skills_of_user` NATURAL JOIN `user` NATURAL JOIN `skills` NATURAL JOIN `jobs`", array('*', '(Urate/Uratetime) AS `Rate`'), " `UID`!='" . antisqli($GLOBALS['myprofile']['UID']) . "' AND `Sname` IN ($where) AND `Ustatus` IN ('Online','Away') GROUP BY `UID` ORDER BY `Rate`,`Ulastonline` DESC LIMIT 10");
             for ($index = 0; $index < count($result); $index++) {
                 $skilldata = array();
-                $skilldata = SearchARows("`skills_of_user` NATURAL JOIN `skills`", array('*'), "`UID`='".antisqli($result[$index]['UID'])."'");
+                $skilldata = SearchARows("`skills_of_user` NATURAL JOIN `skills`", array('*'), "`UID`='" . antisqli($result[$index]['UID']) . "'");
                 $result[$index]['Udiscription'] = "";
                 $result[$index]['Skills'] = $skilldata;
             }
@@ -84,8 +106,10 @@ if (isset($_POST['json'])) {
         fail("Password Missing");
     }
     if ($_POST['uname'] == "tmp" && $_POST['upass'] == "tmp") {
-        $myprofile = array("UID" => "tmp");
-        searchHealper();
+        if(isset($_POST['search'])){
+            $myprofile = array("UID" => "tmp");
+            searchHealper();
+        }
         exitWithPrint();
     }
     $data = SearchARow("user", array('*', '(Urate/Uratetime) AS `Rate`'), "Uemail='" . antisqli($_POST['uname']) . "' ");

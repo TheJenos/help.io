@@ -257,7 +257,8 @@ if (isset($_GET['logout'])) {
             var app = angular.module("home", []);
             var sellect = "skill";
             var wallet = 0;
-            var User;
+            var datas = '<?php echo (isset($_SESSION['userdata'])) ? json_encode($_SESSION['userdata']) : "{}"; ?>';
+            var User = $.parseJSON(datas);
             function showError($txt) {
                 $('#error').fadeIn('fast');
                 $('#error').html($txt);
@@ -289,17 +290,11 @@ if (isset($_GET['logout'])) {
             $(function() {
                 $('#error').hide();
                 $('.dialogbox').hide();
-            });
 <?php if (isset($_SESSION['userdata'])) { ?>
-                app.controller("userinfo", function($scope, $interval) {
-                    var datas = '<?php echo json_encode($_SESSION['userdata']); ?>';
-                    $scope.User = $.parseJSON(datas);
-                    User = $scope.User;
-                    $scope.User.Ulastonline = "Wait A Movement";
-                    $interval(function() {
+                    setInterval(function() {
                         $.post("backend.php", {
-                            "uname": "<?php echo $_SESSION['userdata']['Uemail']; ?>",
-                            "upass": "<?php echo $_SESSION['userdata']['Upass']; ?>",
+                            "uname": "<?php echo isset($_SESSION['userdata']) ? $_SESSION['userdata']['Uemail'] : "tmp"; ?>",
+                            "upass": "<?php echo isset($_SESSION['userdata']) ? $_SESSION['userdata']['Upass'] : "tmp"; ?>",
                             "want": "userinfo",
                             "json": true
                         }).done(function(response) {
@@ -308,17 +303,42 @@ if (isset($_GET['logout'])) {
                                 showError(result.msg);
                             }
                             result.user.Ulastonline = ($.timeago(result.user.Ulastonline) == "Online ago") ? (result.user.Ustatus == "Online") ? "Online Now" : "Online But Away" : "Last Online " + $.timeago(result.user.Ulastonline);
-                            $scope.User = result.user;
-                            User = $scope.User;
+                            User = result.user;
                         });
-                    }, 5000);
+                    }, 1000);
+<?php } ?>
+            });
+<?php if (isset($_SESSION['userdata'])) { ?>
+                app.controller("userinfo", function($scope, $interval) {
+                    var datas = '<?php echo json_encode($_SESSION['userdata']); ?>';
+                    $scope.User = $.parseJSON(datas);
+                    User = $scope.User;
+                    $scope.User.Ulastonline = "Wait A Movement";
+                    $interval(function() {
+                        $scope.User = User;
+                    }, 1000);
                 });
                 app.controller("help", function($scope, $interval) {
                     $interval(function() {
-                        if(User.Ustatus == "Busy"){
-                            showError("I am Busy Now");
+                        if (User.Ustatus == "Busy") {
+                            $.post("backend.php", {
+                                "uname": "<?php echo $_SESSION['userdata']['Uemail']; ?>",
+                                "upass": "<?php echo $_SESSION['userdata']['Upass']; ?>",
+                                "want": "gethelp",
+                                "json": true
+                            }).done(function(response) {
+                                var result = $.parseJSON(response);
+                                if (result.status == "Fail") {
+                                    showError(result.msg);
+                                } else {
+                                    $("#help").fadeIn();
+                                }
+                                $scope.result = result;
+                            });
+                        } else {
+                            $("#help").fadeOut();
                         }
-                    }, 1000);
+                    }, 100);
                 });
                 app.controller("trans", function($scope, $interval) {
                     $interval(function() {
@@ -337,11 +357,22 @@ if (isset($_GET['logout'])) {
                             var tosum = result.Tto.reduce(sum, 0);
                             result.Wallet = tosum - fromsum;
                             wallet = tosum - fromsum;
+                            $scope.User = User;
                             result.trans = result.Tfrom.concat(result.Tto);
                             result.Count = result.Tfrom.length + result.Tto.length;
                             $scope.result = result;
                         });
                     }, 1000);
+                });
+<?php } else { ?>
+                app.controller("userinfo", function($scope, $interval) {
+
+                });
+                app.controller("help", function($scope, $interval) {
+
+                });
+                app.controller("trans", function($scope, $interval) {
+
                 });
 <?php } ?>
             app.controller("search", function($scope, $interval) {
@@ -379,6 +410,7 @@ if (isset($_GET['logout'])) {
                         "upass": "<?php echo isset($_SESSION['userdata']) ? $_SESSION['userdata']['Upass'] : "tmp"; ?>",
                         "want": "requestforhealp",
                         "who": $scope.Suser.UID,
+                        "time": $scope.time,
                         "json": true
                     }).done(function(response) {
                         var result = $.parseJSON(response);
@@ -436,31 +468,25 @@ if (isset($_GET['logout'])) {
                             <li class="page-scroll">
                                 <a href="?helpers">Helpers</a>
                             </li>
-                            <li class="page-scroll">
+                            <li class="page-scroll" >
                                 <?php if (isset($_SESSION['userdata'])) { ?>
-                                <li class="dropdown">
+                                <li class="dropdown" ng-controller="trans">
                                     <a href="#" style="font: 14px 'Lato', Arial;" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
                                         Profile 
-                                        <?php if ($_SESSION['userdata']['Ustatus'] == "Online") { ?>
-                                            <i class="fa fa-user-circle-o" aria-hidden="true"></i>
-                                        <?php } else if ($_SESSION['userdata']['Ustatus'] == "Away") { ?>
-                                            <i class="fa fa-bell-slash" aria-hidden="true"></i>
-                                        <?php } else { ?>
-                                            <i class="fa fa-user" aria-hidden="true"></i>
-                                        <?php } ?>
+                                        <i ng-show="User.Ustatus == 'Online'" class ="fa fa-user-circle-o" aria-hidden="true"></i>
+                                        <i ng-show="User.Ustatus == 'Away'" class="fa fa-bell-slash" aria-hidden="true"></i>
+                                        <i ng-show="User.Ustatus == 'Busy'" class="fa fa-plug" aria-hidden="true"></i>
+                                        <i ng-show="User.Ustatus == 'Offline'" class="fa fa-user" aria-hidden="true"></i>
                                         <span class="caret"></span>
                                     </a>
-                                    <ul class="dropdown-menu" ng-controller="trans">
+                                    <ul class="dropdown-menu">
                                         <li><a href="#">My Wallet : ${{result.Wallet}}</a></li>
                                         <li><a href="#">Transections Count : {{result.Count}}</a></li>
-                                        <li><a href="#">Status : <?php echo $_SESSION['userdata']['Ustatus']; ?></a></li>
+                                        <li><a href="#">Status : {{User.Ustatus}}</a></li>
                                         <li role="separator" class="divider"></li>
-                                        <?php if ($_SESSION['userdata']['Ustatus'] == "Online") { ?>
-                                            <li><a href="?status=Offline">Go Offline <i class="fa fa-user" aria-hidden="true"></i></a></li>
-                                            <li><a href="?status=Away">Away For Site <i class="fa fa-bell-slash" aria-hidden="true"></i></a></li>
-                                        <?php } else { ?>
-                                            <li><a href="?status=Online">Go Online <i class="fa fa-user-circle" aria-hidden="true"></i></a></li>
-                                        <?php } ?>
+                                        <li ng-show="User.Ustatus == 'Online'"><a href="?status=Offline">Go Offline <i class="fa fa-user" aria-hidden="true"></i></a></li>
+                                        <li ng-show="User.Ustatus == 'Online'"><a href="?status=Away">Away For Site <i class="fa fa-bell-slash" aria-hidden="true"></i></a></li>
+                                        <li ng-hide="User.Ustatus == 'Online'"><a href="?status=Online">Go Online <i class="fa fa-user-circle" aria-hidden="true"></i></a></li>
                                         <li><a href="?profile">Profile Info <br>And Transection <i class="fa fa-credit-card-alt" aria-hidden="true"></i></a></li>
                                     </ul>
                                 </li>
@@ -478,6 +504,32 @@ if (isset($_GET['logout'])) {
             </nav>
             <div class="container">
                 <div class="alert alert-danger" id="error"></div>
+                <div class="dialogbox" id="help" ng-controller="help" style="display:none">
+                    <div class="well">
+                        <div style="display: inline-block;width: 100%;">
+                            <div  ng-show="result.type == 'from me'">
+                                <h4 class="float-left ng-binding">Helper's Name : {{result.data.Uname}}</h4>
+                                <h4 class="float-right ng-binding">Requested Hours : ${{result.data.Rlength}}</h4>
+                            </div>
+                            <div  ng-hide="result.type == 'from me'">
+                                <h4 class="float-left ng-binding">Requester Name : {{result.data.Uname}}</h4>
+                                <h4 class="float-right ng-binding">Requested Hours : ${{result.data.Rlength}}</h4>
+                                <figure class="snip1336">
+                                    <img ng-src="<?php echo $hostname; ?>{{result.data.Ubgimage}}" alt="sample87" />
+                                    <b class="simple lastonline" >{{result.data.Ulastonline}}</b>
+                                    <b class="simple perhour" >${{result.data.Uperhour}} Per Hour </b>
+                                    <figcaption>
+                                        <img ng-src="<?php echo $hostname; ?>{{result.data.Upic}}" width="64" alt="profile-sample4" class="profile" />
+                                        <h2>{{result.data.Uname}}({{result.data.Rate}})</h2>
+                                        <a href="#" style="width:100%" class="">Accept The Help</a>
+                                        <a href="#" style="width:100%" class="">Cancel It</a>
+                                    </figcaption>
+                                </figure>
+                            </div>
+                        </div>
+                        <hr>
+                    </div>
+                </div>
             </div>
             <?php if (isset($_GET['helpers'])) { ?>
                 <center ng-controller="search">
@@ -499,7 +551,7 @@ if (isset($_GET['logout'])) {
                     <div class="row"  >
                         <div class="container" style="min-height: 548px;">
                             <?php if (isset($_SESSION['userdata'])) { ?> 
-                                <div id='reqs' class="dialogbox">
+                            <div id='reqs' class="dialogbox" style="display:none">
                                     <div class="well">
                                         <div style="display: inline-block;width: 100%;">
                                             <h4 class="float-left ng-binding">Helper's Name : {{Suser.Uname}}</h4>
@@ -538,11 +590,11 @@ if (isset($_GET['logout'])) {
                                                 </div>
                                                 <div class="checkbox">
                                                     <p>
-                                                        <input name="re" type="checkbox" id="test1"><label for="test1"> Remember me</label>
+                                                        <input name="re" type="checkbox" id="tsdf"><label for="tsdf"> Remember me</label>
                                                     </p>
                                                 </div>
                                                 <div style="text-align: right">
-                                                    <input type="button" id="loginbtn" name="login" class="simple" value="Login">
+                                                    <input type="submit" id="loginbtn" name="login" class="simple" value="Login">
                                                 </div>
                                             </form>
                                         </center>
@@ -572,22 +624,20 @@ if (isset($_GET['logout'])) {
             <?php } else if (isset($_SESSION['userdata']) && isset($_GET['profile'])) { ?>
                 <div class="row"  >
                     <div class="container">
-                        <?php if (isset($_SESSION['userdata'])) { ?>
-                            <div class="col-md-4" ng-controller="userinfo">
-                                <figure class="snip1336">
-                                    <img ng-src="<?php echo $hostname; ?>{{User.Ubgimage}}" alt="sample87" />
-                                    <b class="simple lastonline" >{{User.Ulastonline}}</b>
-                                    <b class="simple perhour" >${{User.Uperhour}} Per Hour </b>
-                                    <figcaption>
-                                        <img ng-src="<?php echo $hostname; ?>{{User.Upic}}" width="64" alt="profile-sample4" class="profile" />
-                                        <h2>{{User.Uname}}({{User.Rate}})<span>{{User.Jname}}</span></h2>
-                                        <p>{{User.Udiscription}}</p>
-                                        <a href="#" style="width:100%" class="">Edit Profile</a>
-                                    </figcaption>
-                                </figure>
+                        <div class="col-md-4" ng-controller="userinfo">
+                            <figure class="snip1336">
+                                <img ng-src="<?php echo $hostname; ?>{{User.Ubgimage}}" alt="sample87" />
+                                <b class="simple lastonline" >{{User.Ulastonline}}</b>
+                                <b class="simple perhour" >${{User.Uperhour}} Per Hour </b>
+                                <figcaption>
+                                    <img ng-src="<?php echo $hostname; ?>{{User.Upic}}" width="64" alt="profile-sample4" class="profile" />
+                                    <h2>{{User.Uname}}({{User.Rate}})<span>{{User.Jname}}</span></h2>
+                                    <p>{{User.Udiscription}}</p>
+                                    <a href="#" style="width:100%" class="">Edit Profile</a>
+                                </figcaption>
+                            </figure>
 
-                            </div>
-                        <?php } ?>
+                        </div>
                         <div class="col-md-8" ng-controller="trans">
                             <div class="well" style="">
                                 <div style="display: inline-block;width: 100%;">

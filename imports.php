@@ -341,6 +341,9 @@
     .dropdown{
         margin-top: 2px;
     }
+    .navbar-custom .navbar-nav li a:active, .navbar-custom .navbar-nav li a:focus {
+        color: black;
+    }
     @media (max-width: 767px) {
         .navbar-default .navbar-nav .open .dropdown-menu>li>a {
             color: #00365a; 
@@ -352,10 +355,15 @@
         .dialogbox{
             position: fixed;
             top: 5%;
-            left: 2%;
+            left: 5%;
             width: 90%;
             z-index: 99999;
             text-align: left;
+        }
+        .dialogbox .col-lg-7{
+            padding-top: 45px;
+            border: 0px !important;
+            border-top: 1px solid #00365a;
         }
         .txtarea{
             color: #777;
