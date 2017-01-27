@@ -339,6 +339,67 @@ if (isset($_GET['logout'])) {
                             $("#help").fadeOut();
                         }
                     }, 100);
+                    $scope.cancelit = function() {
+                        $.post("backend.php", {
+                            "uname": "<?php echo $_SESSION['userdata']['Uemail']; ?>",
+                            "upass": "<?php echo $_SESSION['userdata']['Upass']; ?>",
+                            "want": "cancelrequest",
+                            "id": $scope.result.data.RID,
+                            "json": true
+                        }).done(function(response) {
+                            var result = $.parseJSON(response);
+                            if (result.status == "Fail") {
+                                showError(result.msg);
+                            } else {
+                                $("#help").fadeOut();
+                            }
+                        });
+                    }
+                    $scope.endit = function() {
+                        $.post("backend.php", {
+                            "uname": "<?php echo $_SESSION['userdata']['Uemail']; ?>",
+                            "upass": "<?php echo $_SESSION['userdata']['Upass']; ?>",
+                            "want": "endit",
+                            "id": $scope.result.data.RID,
+                            "json": true
+                        }).done(function(response) {
+                            var result = $.parseJSON(response);
+                            if (result.status == "Fail") {
+                                showError(result.msg);
+                            } else {
+                                $("#help").fadeOut();
+                            }
+                        });
+                    }
+                    $scope.accpetit = function() {
+                        $.post("backend.php", {
+                            "uname": "<?php echo $_SESSION['userdata']['Uemail']; ?>",
+                            "upass": "<?php echo $_SESSION['userdata']['Upass']; ?>",
+                            "want": "accpetrequest",
+                            "id": $scope.result.data.RID,
+                            "json": true
+                        }).done(function(response) {
+                            var result = $.parseJSON(response);
+                            if (result.status == "Fail") {
+                                showError(result.msg);
+                            }
+                        });
+                    }
+                    $scope.addtime = function(time) {
+                        $.post("backend.php", {
+                            "uname": "<?php echo $_SESSION['userdata']['Uemail']; ?>",
+                            "upass": "<?php echo $_SESSION['userdata']['Upass']; ?>",
+                            "want": "addtime",
+                            "id": $scope.result.data.RID,
+                            "time": time,
+                            "json": true
+                        }).done(function(response) {
+                            var result = $.parseJSON(response);
+                            if (result.status == "Fail") {
+                                showError(result.msg);
+                            }
+                        });
+                    }
                 });
                 app.controller("trans", function($scope, $interval) {
                     $interval(function() {
@@ -504,30 +565,58 @@ if (isset($_GET['logout'])) {
             </nav>
             <div class="container">
                 <div class="alert alert-danger" id="error"></div>
-                <div class="dialogbox" id="help" ng-controller="help" style="display:none">
-                    <div class="well">
-                        <div style="display: inline-block;width: 100%;">
-                            <div  ng-show="result.type == 'from me'">
-                                <h4 class="float-left ng-binding">Helper's Name : {{result.data.Uname}}</h4>
-                                <h4 class="float-right ng-binding">Requested Hours : ${{result.data.Rlength}}</h4>
-                            </div>
-                            <div  ng-hide="result.type == 'from me'">
-                                <h4 class="float-left ng-binding">Requester Name : {{result.data.Uname}}</h4>
-                                <h4 class="float-right ng-binding">Requested Hours : ${{result.data.Rlength}}</h4>
-                                <figure class="snip1336">
-                                    <img ng-src="<?php echo $hostname; ?>{{result.data.Ubgimage}}" alt="sample87" />
-                                    <b class="simple lastonline" >{{result.data.Ulastonline}}</b>
-                                    <b class="simple perhour" >${{result.data.Uperhour}} Per Hour </b>
-                                    <figcaption>
-                                        <img ng-src="<?php echo $hostname; ?>{{result.data.Upic}}" width="64" alt="profile-sample4" class="profile" />
-                                        <h2>{{result.data.Uname}}({{result.data.Rate}})</h2>
-                                        <a href="#" style="width:100%" class="">Accept The Help</a>
-                                        <a href="#" style="width:100%" class="">Cancel It</a>
-                                    </figcaption>
-                                </figure>
-                            </div>
+                <div class="dialogbox askcard" id="help" ng-controller="help" style="display:none;">
+                    <div style="display: inline-block;width: 100%;">
+                        <div  ng-show="result.type == 'accpted'">
+                            <figure class="snip1336">
+                                <img ng-src="<?php echo $hostname; ?>{{result.data.Ubgimage}}" alt="sample87" />
+                                <b class="simple lastonline" >Requested Hours {{result.data.Rlength}}</b>
+                                <figcaption>
+                                    <img ng-src="<?php echo $hostname; ?>{{result.data.Upic}}" width="64" alt="profile-sample4" class="profile" />
+                                    <h2>{{result.data.Uname}}({{result.data.Rate}})</h2>
+                                    <h2>TIME {{result.data.Timediv}}</h2>
+                                    <a href="#" style="width:100%" class="" ng-click="addtime(1)">+1 Hour</a>
+                                    <a href="#" style="width:100%" class="" ng-click="addtime(2)">+2 Hour</a>
+                                    <a href="#" style="width:100%" class="" ng-click="endit()">Cancel It</a>
+                                </figcaption>
+                            </figure>
                         </div>
-                        <hr>
+                        <div  ng-show="result.type == 'accpted me'">
+                            <figure class="snip1336">
+                                <img ng-src="<?php echo $hostname; ?>{{result.data.Ubgimage}}" alt="sample87" />
+                                <b class="simple lastonline" >Requested Hours {{result.data.Rlength}}</b>
+                                <figcaption>
+                                    <img ng-src="<?php echo $hostname; ?>{{result.data.Upic}}" width="64" alt="profile-sample4" class="profile" />
+                                    <h2>{{result.data.Uname}}({{result.data.Rate}})</h2>
+                                    <h2>TIME : {{result.data.Timediv}}</h2>
+                                    <a href="#" style="width:100%" class="" ng-click="endit()">Cancel It</a>
+                                </figcaption>
+                            </figure>
+                        </div>
+                        <div  ng-show="result.type == 'from me'">
+                            <figure class="snip1336">
+                                <img ng-src="<?php echo $hostname; ?>{{result.data.Ubgimage}}" alt="sample87" />
+                                <b class="simple lastonline" >Requested Hours {{result.data.Rlength}}</b>
+                                <figcaption>
+                                    <img ng-src="<?php echo $hostname; ?>{{result.data.Upic}}" width="64" alt="profile-sample4" class="profile" />
+                                    <h2>{{result.data.Uname}}({{result.data.Rate}})</h2>
+                                    <span>Waiting For The Answer</span>
+                                    <a href="#" style="width:100%" class="" ng-click="cancelit()">Cancel It</a>
+                                </figcaption>
+                            </figure>
+                        </div>
+                        <div  ng-show="result.type == 'to me'">
+                            <figure class="snip1336">
+                                <img ng-src="<?php echo $hostname; ?>{{result.data.Ubgimage}}" alt="sample87" />
+                                <b class="simple lastonline" >Requested Hours {{result.data.Rlength}}</b>
+                                <figcaption>
+                                    <img ng-src="<?php echo $hostname; ?>{{result.data.Upic}}" width="64" alt="profile-sample4" class="profile" />
+                                    <h2>{{result.data.Uname}}({{result.data.Rate}})</h2>
+                                    <a href="#" style="width:100%" class="" ng-click="accpetit()">Accept The Help</a>
+                                    <a href="#" style="width:100%" class="" ng-click="cancelit()">Cancel It</a>
+                                </figcaption>
+                            </figure>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -551,7 +640,7 @@ if (isset($_GET['logout'])) {
                     <div class="row"  >
                         <div class="container" style="min-height: 548px;">
                             <?php if (isset($_SESSION['userdata'])) { ?> 
-                            <div id='reqs' class="dialogbox" style="display:none">
+                                <div id='reqs' class="dialogbox" style="display:none">
                                     <div class="well">
                                         <div style="display: inline-block;width: 100%;">
                                             <h4 class="float-left ng-binding">Helper's Name : {{Suser.Uname}}</h4>

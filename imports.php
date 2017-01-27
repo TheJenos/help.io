@@ -344,6 +344,10 @@
     .navbar-custom .navbar-nav li a:active, .navbar-custom .navbar-nav li a:focus {
         color: black;
     }
+    .askcard{
+        width: 30%;
+        left:35%;
+    }
     @media (max-width: 767px) {
         .navbar-default .navbar-nav .open .dropdown-menu>li>a {
             color: #00365a; 
@@ -356,6 +360,7 @@
             position: fixed;
             top: 5%;
             left: 5%;
+            height: 90%;
             width: 90%;
             z-index: 99999;
             text-align: left;

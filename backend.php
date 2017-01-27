@@ -52,11 +52,51 @@ function requestforhealp() {
     Insert("helprequest", $resquest);
 }
 
+function cancelrequest(){
+    $data = array('Ranswer' => "Cancel");
+    Update("`helprequest`", $data, "RID='" . antisqli($_POST['id']) . "'");
+}
+
+function endit(){
+    $data = array('Ranswer' => "Ended");
+    Update("`helprequest`", $data, "RID='" . antisqli($_POST['id']) . "'");
+}
+
+function addtime(){
+    $row = SearchARow("`helprequest`", array('*'), "RID='" . antisqli($_POST['id']) . "'");
+    $to = SearchARow("`user`", array('Uperhour'), "UID='" . antisqli($row['Rto']) . "'");
+    $data = array('Rlength' => $row['Rlength']+$_POST['time']);
+    $cac = $row['time']*$to['Uperhour'];
+    $resquest = array(
+        "Tfrom"=>$row['Rfrom'],
+        "Tto"=>$row['Rto'],
+        "Tamount"=>$cac,
+    );
+    Insert("transaction", $resquest);
+    Update("`helprequest`", $data, "RID='" . antisqli($_POST['id']) . "'");
+}
+
+function accpetrequest(){
+    $data = array('Ranswer' => "Accepted",'Rstarttime' => "CURRENT_TIMESTAMP");
+    Update("`helprequest`", $data, "RID='" . antisqli($_POST['id']) . "'");
+    $row = SearchARow("`helprequest`", array('*'), "RID='" . antisqli($_POST['id']) . "'");
+    $to = SearchARow("`user`", array('Uperhour'), "UID='" . antisqli($row['Rto']) . "'");
+    $cac = $row['Rlength']*$to['Uperhour'];
+    $resquest = array(
+        "Tfrom"=>$row['Rfrom'],
+        "Tto"=>$row['Rto'],
+        "Tamount"=>$cac,
+    );
+    Insert("transaction", $resquest);   
+}
+
 function gethelp() {
     $sql = "DELETE FROM `helprequest` WHERE SUBTIME(NOW(),'0:05:00') > `Rdatetime` AND `Ranswer`='Waiting'";
     excquery($sql);
-    $gethelpto = mySearchARow("`helprequest` JOIN `user` ON `helprequest`.`Rfrom` = `user`.`UID`", array('Rfrom', 'Rlength', 'Rdatetime', 'Ranswer', 'Rstarttime', 'UID', 'Uname','Upic','Ubgimage','Uperhour','(Urate/Uratetime) AS `Rate`'), "`Rto`='" . antisqli($GLOBALS['myprofile']['UID']) . "' AND `Rdatetime` > SUBTIME(NOW(),'0:05:00') AND `Ranswer`='Waiting' ORDER BY `Rdatetime` DESC");
-    $gethelpfrom = mySearchARow("`helprequest` JOIN `user` ON `helprequest`.`Rto` = `user`.`UID` ", array('Rto', 'Rlength', 'Rdatetime', 'Ranswer', 'Rstarttime', 'UID', 'Uname','Upic','Ubgimage','Uperhour','(Urate/Uratetime) AS `Rate`'), "`Rfrom`='" . antisqli($GLOBALS['myprofile']['UID']) . "' AND `Rdatetime` > SUBTIME(NOW(),'0:05:00') AND `Ranswer`='Waiting' ORDER BY `Rdatetime` DESC");
+    $gethelpto = SearchARow("`helprequest` JOIN `user` ON `helprequest`.`Rfrom` = `user`.`UID`", array('RID','Rfrom', 'Rlength', 'Rdatetime', 'Ranswer', 'Rstarttime', 'UID', 'Uname','Upic','Ubgimage','Uperhour','(Urate/Uratetime) AS `Rate`'), "`Rto`='" . antisqli($GLOBALS['myprofile']['UID']) . "' AND `Rdatetime` > SUBTIME(NOW(),'0:05:00') AND `Ranswer`='Waiting' ORDER BY `Rdatetime` DESC");
+    $getaccptto = SearchARow("`helprequest` JOIN `user` ON `helprequest`.`Rfrom` = `user`.`UID`", array('RID','Rfrom', 'Rlength', 'Rdatetime', 'Ranswer', 'Rstarttime', 'UID', 'Uname','Upic','Ubgimage','Uperhour','(Urate/Uratetime) AS `Rate`','TIMEDIFF(now(),`Rstarttime`) AS `Timediv`'), "`Rto`='" . antisqli($GLOBALS['myprofile']['UID']) . "' AND `Ranswer`='Accepted' ORDER BY `Rdatetime` DESC");
+    $gethelpfrom = SearchARow("`helprequest` JOIN `user` ON `helprequest`.`Rto` = `user`.`UID` ", array('RID','Rto', 'Rlength', 'Rdatetime', 'Ranswer', 'Rstarttime', 'UID', 'Uname','Upic','Ubgimage','Uperhour','(Urate/Uratetime) AS `Rate`'), "`Rfrom`='" . antisqli($GLOBALS['myprofile']['UID']) . "' AND `Rdatetime` > SUBTIME(NOW(),'0:05:00') AND `Ranswer`='Waiting' ORDER BY `Rdatetime` DESC");
+    $getaccptfrom = SearchARow("`helprequest` JOIN `user` ON `helprequest`.`Rto` = `user`.`UID` ", array('RID','Rto', 'Rlength', 'Rdatetime', 'Ranswer', 'Rstarttime', 'UID', 'Uname','Upic','Ubgimage','Uperhour','(Urate/Uratetime) AS `Rate`','TIMEDIFF(now(),`Rstarttime`) AS `Timediv`'), "`Rfrom`='" . antisqli($GLOBALS['myprofile']['UID']) . "' AND `Ranswer`='Accepted' ORDER BY `Rdatetime` DESC");
     $data = null;
     if (isset($gethelpto)) {
         $GLOBALS['json']['type'] = "to me";
@@ -64,10 +104,16 @@ function gethelp() {
     } else if (isset($gethelpfrom)) {
         $GLOBALS['json']['type'] = "from me";
         $data = $gethelpfrom;
+    } else if (isset($getaccptto)) {
+        $data = $getaccptto;
+        $GLOBALS['json']['type'] = "accpted me";
+    } else if (isset($getaccptfrom)) {
+        $data = $getaccptfrom;
+        $GLOBALS['json']['type'] = "accpted";
     } else {
         $data1 = array('Ustatus' => "Online");
         Update("`user`", $data1, "UID='" . antisqli($GLOBALS['myprofile']['UID']) . "'");
-        fail("Resqest Expired");
+        fail("Resqest Canceled");
     }
     $GLOBALS['json']['data'] = $data;
 }
