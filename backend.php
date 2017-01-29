@@ -52,6 +52,11 @@ function requestforhealp() {
     Insert("helprequest", $resquest);
 }
 
+function updatepro(){
+    $data = $_POST['user'];
+    Update("`user`", $data, "UID='" . antisqli($GLOBALS['myprofile']['UID']) . "'");
+}
+
 function cancelrequest() {
     $data = array('Ranswer' => "Cancel");
     Update("`helprequest`", $data, "RID='" . antisqli($_POST['id']) . "'");

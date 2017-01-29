@@ -51,7 +51,7 @@
         color: #00365a;
         font-size: 0.7em;
         text-transform: none !important;
-        margin: 10px 0;
+        margin: 5px 0;
         display: inline-block;
         padding: 5px 15px;
         text-align: center;
@@ -351,6 +351,9 @@
         top: 13%;
         left: 35%;
         width: 30%;
+    }
+    .dialogbox .form-group {
+         margin-bottom: 0px;
     }
     @media (max-width: 767px) {
         .navbar-default .navbar-nav .open .dropdown-menu>li>a {
