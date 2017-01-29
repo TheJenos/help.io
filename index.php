@@ -260,11 +260,13 @@ if (isset($_GET['logout'])) {
             var datas = '<?php echo (isset($_SESSION['userdata'])) ? json_encode($_SESSION['userdata']) : "{}"; ?>';
             var User = $.parseJSON(datas);
             function showError($txt) {
-                $('#error').fadeIn('fast');
-                $('#error').html($txt);
-                setTimeout(function() {
-                    $('#error').fadeOut('fast');
-                }, 2000);
+                if ($txt != 'no') {
+                    $('#error').fadeIn('fast');
+                    $('#error').html($txt);
+                    setTimeout(function() {
+                        $('#error').fadeOut('fast');
+                    }, 2000);
+                }
             }
             function hideDialog($id) {
                 $($id).fadeOut();
@@ -290,6 +292,9 @@ if (isset($_GET['logout'])) {
             $(function() {
                 $('#error').hide();
                 $('.dialogbox').hide();
+                $('#bar').barrating({
+                    theme: 'fontawesome-stars'
+                });
 <?php if (isset($_SESSION['userdata'])) { ?>
                     setInterval(function() {
                         $.post("backend.php", {
@@ -319,6 +324,7 @@ if (isset($_GET['logout'])) {
                     }, 1000);
                 });
                 app.controller("help", function($scope, $interval) {
+                    $scope.rating = 0;
                     $interval(function() {
                         if (User.Ustatus == "Busy") {
                             $.post("backend.php", {
@@ -333,12 +339,36 @@ if (isset($_GET['logout'])) {
                                 } else {
                                     $("#help").fadeIn();
                                 }
+                                $scope.rating = $('#bar').val();
+                                $('#chat-scroll').animate({
+                                    scrollTop: $('#chat-scroll').get(0).scrollHeight}, 2000);
+                                $('#chat-scroll1').animate({
+                                    scrollTop: $('#chat-scroll1').get(0).scrollHeight}, 2000);
                                 $scope.result = result;
                             });
                         } else {
                             $("#help").fadeOut();
                         }
                     }, 100);
+                    $scope.runScript = function(txt, e) {
+                        if (sellect == "skill" && e.which == 13) {
+                            $.post("backend.php", {
+                                "uname": "<?php echo $_SESSION['userdata']['Uemail']; ?>",
+                                "upass": "<?php echo $_SESSION['userdata']['Upass']; ?>",
+                                "want": "chat",
+                                "msg": $scope.chattxt,
+                                "id": $scope.result.data.RID,
+                                "json": true
+                            }).done(function(response) {
+                                var result = $.parseJSON(response);
+                                if (result.status == "Fail") {
+                                    showError(result.msg);
+                                } else {
+                                    $scope.chattxt = "";
+                                }
+                            });
+                        }
+                    }
                     $scope.cancelit = function() {
                         $.post("backend.php", {
                             "uname": "<?php echo $_SESSION['userdata']['Uemail']; ?>",
@@ -360,6 +390,7 @@ if (isset($_GET['logout'])) {
                             "uname": "<?php echo $_SESSION['userdata']['Uemail']; ?>",
                             "upass": "<?php echo $_SESSION['userdata']['Upass']; ?>",
                             "want": "endit",
+                            "rate": $scope.rating,
                             "id": $scope.result.data.RID,
                             "json": true
                         }).done(function(response) {
@@ -568,55 +599,86 @@ if (isset($_GET['logout'])) {
                 <div class="dialogbox askcard" id="help" ng-controller="help" style="display:none;">
                     <div style="display: inline-block;width: 100%;">
                         <div  ng-show="result.type == 'accpted'">
-                            <figure class="snip1336">
-                                <img ng-src="<?php echo $hostname; ?>{{result.data.Ubgimage}}" alt="sample87" />
-                                <b class="simple lastonline" >Requested Hours {{result.data.Rlength}}</b>
-                                <figcaption>
-                                    <img ng-src="<?php echo $hostname; ?>{{result.data.Upic}}" width="64" alt="profile-sample4" class="profile" />
-                                    <h2>{{result.data.Uname}}({{result.data.Rate}})</h2>
-                                    <h2>TIME {{result.data.Timediv}}</h2>
-                                    <a href="#" style="width:100%" class="" ng-click="addtime(1)">+1 Hour</a>
-                                    <a href="#" style="width:100%" class="" ng-click="addtime(2)">+2 Hour</a>
-                                    <a href="#" style="width:100%" class="" ng-click="endit()">Cancel It</a>
-                                </figcaption>
-                            </figure>
+                            <div class="well">
+                                <div class="" style="display: inline-block;width: 100%"  >
+                                    <div class="col-xs-7" style="display: inline-block;margin-right: 0px !important;padding-right: 0px;padding-left: 5px;"  >
+                                        <h5 style="margin-top: 0px; margin-bottom: 5px;">{{result.data.Uname}} ({{result.data.Rate}})</h5>
+                                        <h5 style="margin-top: 0px; margin-bottom: 5px;">Time : {{result.data.Timediv}}</h5>
+                                        <h5 style="margin-top: 0px; margin-bottom: 5px;">Requested Hours {{result.data.Rlength}}</h5>
+                                        <h5 style="margin-top: 0px; margin-bottom: 5px;">Rating : {{rating}}</h5>
+                                        <div class="br-wrapper br-theme-fontawesome-stars">
+                                            <select id="bar"> <!-- now hidden -->
+                                                <option value="0">0</option>
+                                                <option value="1">1</option>
+                                                <option value="2">2</option>
+                                                <option value="3">3</option>
+                                                <option value="4">4</option>
+                                                <option value="5">5</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class=" col-xs-5" style="padding-right: 5px;">
+                                        <div class="float-right">
+                                            <a href="#" style="margin: 2px 0" class="simple " ng-click="addtime(1)">+1 Hour</a><br>
+                                            <a href="#" style="margin: 2px 0" class="simple " ng-click="endit()">End Sessions</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="chat-scroll" style="width: 100%;border: 1px solid black;padding:5px;height:200px;overflow-y: scroll;">
+                                    <div ng-repeat="x in result.chat">{{x.Uname.split(" ")[0]}}:{{x.Ctxt}}<hr></div>
+                                </div>
+                                <div class="" style="display: inline-block;width: 100%;margin-top:10px"  >
+                                    <input style="margin: 0px 0;width: 100%;padding: 4px 3px;" ng-keyup="runScript(this.value, $event)" type="text" name="username" class="simple" id="user" ng-model="chattxt" autocomplete="off">
+                                </div>
+                            </div>
                         </div>
                         <div  ng-show="result.type == 'accpted me'">
-                            <figure class="snip1336">
-                                <img ng-src="<?php echo $hostname; ?>{{result.data.Ubgimage}}" alt="sample87" />
-                                <b class="simple lastonline" >Requested Hours {{result.data.Rlength}}</b>
-                                <figcaption>
-                                    <img ng-src="<?php echo $hostname; ?>{{result.data.Upic}}" width="64" alt="profile-sample4" class="profile" />
-                                    <h2>{{result.data.Uname}}({{result.data.Rate}})</h2>
-                                    <h2>TIME : {{result.data.Timediv}}</h2>
-                                    <a href="#" style="width:100%" class="" ng-click="endit()">Cancel It</a>
-                                </figcaption>
-                            </figure>
+                            <div class=" well">
+                                <div class="" style="display: inline-block;width: 100%"  >
+                                    <div class="col-xs-7" style="display: inline-block;margin-right: 0px !important;padding-right: 0px;padding-left: 5px;"  >
+                                        <h5 style="margin-top: 0px; margin-bottom: 5px;">{{result.data.Uname}} ({{result.data.Rate}})</h5>
+                                        <h5 style="margin-top: 0px; margin-bottom: 5px;">Time : {{result.data.Timediv}}</h5>
+                                        <h5 style="margin-top: 0px; margin-bottom: 5px;">Requested Hours {{result.data.Rlength}}</h5>
+                                    </div>
+                                    <div class=" col-xs-5" style="padding-right: 5px;">
+                                        <div class="float-right">
+                                            <a href="#" style="margin: 2px 0" class="simple " ng-click="endit()">End Sessions</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="chat-scroll1" style="width: 100%;border: 1px solid black;padding:5px;height:200px;overflow-y: scroll;">
+                                    <div ng-repeat="x in result.chat">{{x.Uname.split(" ")[0]}}:{{x.Ctxt}}<hr></div>
+                                </div>
+                                <div class="" style="display: inline-block;width: 100%;margin-top:10px"  >
+                                    <input style="margin: 0px 0;width: 100%;padding: 4px 3px;" ng-keyup="runScript(this.value, $event)" type="text" name="username" class="simple" id="user" ng-model="chattxt" autocomplete="off">
+                                </div>
+                            </div>
+
                         </div>
-                        <div  ng-show="result.type == 'from me'">
-                            <figure class="snip1336">
-                                <img ng-src="<?php echo $hostname; ?>{{result.data.Ubgimage}}" alt="sample87" />
-                                <b class="simple lastonline" >Requested Hours {{result.data.Rlength}}</b>
-                                <figcaption>
-                                    <img ng-src="<?php echo $hostname; ?>{{result.data.Upic}}" width="64" alt="profile-sample4" class="profile" />
-                                    <h2>{{result.data.Uname}}({{result.data.Rate}})</h2>
-                                    <span>Waiting For The Answer</span>
-                                    <a href="#" style="width:100%" class="" ng-click="cancelit()">Cancel It</a>
-                                </figcaption>
-                            </figure>
-                        </div>
-                        <div  ng-show="result.type == 'to me'">
-                            <figure class="snip1336">
-                                <img ng-src="<?php echo $hostname; ?>{{result.data.Ubgimage}}" alt="sample87" />
-                                <b class="simple lastonline" >Requested Hours {{result.data.Rlength}}</b>
-                                <figcaption>
-                                    <img ng-src="<?php echo $hostname; ?>{{result.data.Upic}}" width="64" alt="profile-sample4" class="profile" />
-                                    <h2>{{result.data.Uname}}({{result.data.Rate}})</h2>
-                                    <a href="#" style="width:100%" class="" ng-click="accpetit()">Accept The Help</a>
-                                    <a href="#" style="width:100%" class="" ng-click="cancelit()">Cancel It</a>
-                                </figcaption>
-                            </figure>
-                        </div>
+                    </div>
+                    <div  ng-show="result.type == 'from me'">
+                        <figure class="snip1336" style="">
+                            <img ng-src="<?php echo $hostname; ?>{{result.data.Ubgimage}}" alt="sample87" />
+                            <b class="simple lastonline" >Requested Hours {{result.data.Rlength}}</b>
+                            <figcaption>
+                                <img ng-src="<?php echo $hostname; ?>{{result.data.Upic}}" width="64" alt="profile-sample4" class="profile" />
+                                <h2>{{result.data.Uname}}({{result.data.Rate}})</h2>
+                                <span>Waiting For The Answer</span>
+                                <a href="#" style="width:100%" class="" ng-click="cancelit()">Cancel It</a>
+                            </figcaption>
+                        </figure>
+                    </div>
+                    <div  ng-show="result.type == 'to me'">
+                        <figure class="snip1336" style="">
+                            <img ng-src="<?php echo $hostname; ?>{{result.data.Ubgimage}}" alt="sample87" />
+                            <b class="simple lastonline" >Requested Hours {{result.data.Rlength}}</b>
+                            <figcaption>
+                                <img ng-src="<?php echo $hostname; ?>{{result.data.Upic}}" width="64" alt="profile-sample4" class="profile" />
+                                 <h2>{{result.data.Uname}}({{result.data.Rate}})</h2>
+                                 <a href="#" style="width:100%" class="" ng-click="accpetit()">Accept The Help</a>
+                                <a href="#" style="width:100%" class="" ng-click="cancelit()">Cancel It</a>
+                            </figcaption>
+                        </figure>
                     </div>
                 </div>
             </div>
@@ -662,49 +724,49 @@ if (isset($_GET['logout'])) {
                                 </div>
                             <?php } else { ?>
                                 <div id='reqs' class="dialogbox">
-                                    <div class="well row">
-                                        <center>
-                                            <h2 class="col-lg-5" style="margin-top: 45px;">Please Create A Account 
-                                                </br> Or 
-                                                </br> Sign Up 
-                                            </h2>
-                                            <form class="col-lg-7" style="border-left: 1px solid #00365a;text-align: left;" role="form" id="myform" action="backend.php" method="POST" novalidate="" >
-                                                <div class="form-group">
-                                                    <label for="email">Username or Email</label>
-                                                    <input type="text" name="username" class="form-control simple" id="user" ng-model="username" autocomplete="off">
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="pwd">Password</label>
-                                                    <input type="password" name="pass" class="form-control simple" id="pass" ng-model="pass" autocomplete="off">
-                                                </div>
-                                                <div class="checkbox">
-                                                    <p>
-                                                        <input name="re" type="checkbox" id="tsdf"><label for="tsdf"> Remember me</label>
-                                                    </p>
-                                                </div>
-                                                <div style="text-align: right">
-                                                    <input type="submit" id="loginbtn" name="login" class="simple" value="Login">
-                                                </div>
-                                            </form>
-                                        </center>
-                                    </div>
-                                </div>
-                            <?php } ?>
-                            <div class="col-md-4" ng-repeat="x in result.found" >
-                                <figure class="snip1336" >
-                                    <img ng-src="<?php echo $hostname; ?>{{x.Ubgimage}}" alt="sample87" />
-                                    <b class="simple lastonline" >{{x.Ulastonline}}</b>
-                                    <b class="simple perhour" >${{x.Uperhour}} Per Hour </b>
-                                    <figcaption>
-                                        <img ng-src="<?php echo $hostname; ?>{{x.Upic}}" width="64" alt="profile-sample4" class="profile" />
-                                        <h2>{{x.Uname}}({{x.Rate}})<span>{{x.Jname}}<br></span></h2>
-                                        <p>{{x.Udiscription}}</p>
-                                        <ul style="padding-left: 15px;">
-                                            <li ng-repeat="y in x.Skills">{{y.Sname}}</li>
-                                        </ul>
-                                        <a href="#" style="width:100%" class="" ng-show="x.Ulastonline == 'Online Now'" ng-click="showDialog('#reqs', x.UID)">Request</a>
-                                    </figcaption>
-                                </figure>
+                                                     <div class="well row">
+                                                         <center>
+                                                             <h2 class="col-lg-5" style="margin-top: 45px;">Please Create A Account 
+                                                                 </br> Or 
+                                                                 </br> Sign Up 
+                                                             </h2>
+                                                             <form class="col-lg-7" style="border-left: 1px solid #00365a;text-align: left;" role="form" id="myform" action="backend.php" method="POST" novalidate="" >
+                                                                 <div class="form-group">
+                                                                     <label for="email">Username or Email</label>
+                                                                     <input type="text" name="username" class="form-control simple" id="user" ng-model="username" autocomplete="off">
+                                                                 </div>
+                                                                 <div class="form-group">
+                                                                     <label for="pwd">Password</label>
+                                                                     <input type="password" name="pass" class="form-control simple" id="pass" ng-model="pass" autocomplete="off">
+                                                                 </div>
+                                                                 <div class="checkbox">
+                                                                     <p>
+                                                                         <input name="re" type="checkbox" id="tsdf"><label for="tsdf"> Remember me</label>
+                                                                     </p>
+                                                                 </div>
+                                                                 <div style="text-align: right">
+                                                                     <input type="submit" id="loginbtn" name="login" class="simple" value="Login">
+                                                                 </div>
+                                                             </form>
+                                                         </center>
+                                                     </div>
+                                                 </div>
+                                             <?php } ?>
+                                             <div class="col-md-4" ng-repeat="x in result.found" >
+                                                 <figure class="snip1336" >
+                                                     <img ng-src="<?php echo $hostname; ?>{{x.Ubgimage}}" alt="sample87" />
+                                                     <b class="simple lastonline" >{{x.Ulastonline}}</b>
+                                                     <b class="simple perhour" >${{x.Uperhour}} Per Hour </b>
+                                                     <figcaption>
+                                                         <img ng-src="<?php echo $hostname; ?>{{x.Upic}}" width="64" alt="profile-sample4" class="profile" />
+                                                     <h2>{{x.Uname}}({{x.Rate}})<span>{{x.Jname}}<br></span></h2>
+                                                     <p>{{x.Udiscription}}</p>
+                                                     <ul style="padding-left: 15px;">
+                                                         <li ng-repeat="y in x.Skills">{{y.Sname}}</li>
+                                                     </ul>
+                                                     <a href="#" style="width:100%" class="" ng-show="x.Ulastonline == 'Online Now'" ng-click="showDialog('#reqs', x.UID)">Request</a>
+                                                 </figcaption>
+                                             </figure>
 
                             </div>
                         </div>
@@ -765,146 +827,146 @@ if (isset($_GET['logout'])) {
                 <center>
                     <h3 class="box-h3" style="padding:20px;margin: 10%"><?php echo randQuotes(); ?></h3>
 
-                </center>
-            </div>
-            <div class="txtarea" style="">
-                <p>
-                    Volunteering your time, money, or energy to help others doesn’t just make the world better—it also makes you better. Studies indicate that the very act of giving back to the community boosts your happiness, health, and sense of well-being. Here are seven scientific benefits of lending a hand to those in need. 
-                </p>
-                <h3 style="text-align:center;" class="box-h3">
-                    1. HELPING OTHERS CAN HELP YOU LIVE LONGER. 
-                </h3>
-                <p>
-                    Want to extend your lifespan? Think about regularly assisting at a soup kitchen or coaching a basketball team at an at-risk high school. Research has shown that these kinds of activities can improve health in ways that can length your lifespan—volunteers show an improved ability to manage stress and stave off disease as well as reduced rates of depression and an increased sense of life satisfaction—when they were performed on a regular basis. This might be because volunteering alleviates loneliness and enhances our social lives—factors that can significantly affect our long-term health.  
-                </p>
-                <h3 style="text-align:center;" class="box-h3">
-                    2. ALTRUISM IS CONTAGIOUS. 
-                </h3>
-                <p>
-                    When one person performs a good deed, it causes a chain reaction of other altruistic acts. One study found that people are more likely to perform feats of generosity after observing another do the same. This effect can ripple throughout the community, inspiring dozens of individuals to make a difference.  
-                </p>
-                <h3 style="text-align:center;" class="box-h3">
-                    3. HELPING OTHERS MAKES US HAPPY. 
-                </h3>
-                <p>
-                    One team of sociologists tracked 2000 people over a five-year period and found that Americans who described themselves as “very happy” volunteered at least 5.8 hours per month. This heightened sense of well-being might be the byproduct of being more physically active as a result of volunteering, or because it makes us more socially active. Researchers also think that giving back might give individuals a mental boost by providing them with a neurochemical sense of reward. 
-                </p>
-                <h3 style="text-align:center;" class="box-h3">
-                    4. HELPING OTHERS MAY HELP WITH CHRONIC PAIN. 
-                </h3>
-                <p>
-                    According to one study, people who suffered from chronic pain tried working as peer volunteers. As a result, they experienced a reduction in their own symptoms. 
-                </p>
-                <h3 style="text-align:center;" class="box-h3">
-                    5. HELPING OTHERS LOWERS BLOOD PRESSURE. 
-                </h3>
-                <p>
-                    If you’re at risk for heart problems, your doctor has probably told you to cut back on red meat or the hours at your stressful job. However, you should also consider adding something to your routine: a regular volunteer schedule. One piece of research showed that older individuals who volunteered for at least 200 hours a year decreased their risk of hypertension by a whopping 40 percent. This could possibly be because they were provided with more social opportunities, which help relieve loneliness and the stress that often accompanies it.  
-                </p>
-                <h3 style="text-align:center;" class="box-h3">
-                    6. HELPING OTHERS PROMOTES POSITIVE BEHAVIORS IN TEENS. 
-                </h3>
-                <p>
-                    According to sociologists, teenagers who volunteer have better grades and self-image. 
-                </p>
-                <h3 style="text-align:center;" class="box-h3">
-                    7. HELPING OTHERS GIVES US A SENSE OF PURPOSE AND SATISFACTION. 
-                </h3>
-                <p>
-                    Looking for more meaning in your day-to-day existence? Studies show that volunteering enhances an individual’s overall sense of purpose and identity—particularly if they no longer hold a life-defining role like “worker” or “parent.” 
-                </p>
-            </div>
-            <div class="parallax1" style="padding: 5%">
-                <center>
-                    <h3 style="text-align:center;margin-bottom: 40px" class="box-h3">
-                        Top 3 Helpers
+                    </center>
+                </div>
+                <div class="txtarea" style="">
+                    <p>
+                        Volunteering your time, money, or energy to help others doesn’t just make the world better—it also makes you better. Studies indicate that the very act of giving back to the community boosts your happiness, health, and sense of well-being. Here are seven scientific benefits of lending a hand to those in need. 
+                    </p>
+                    <h3 style="text-align:center;" class="box-h3">
+                        1. HELPING OTHERS CAN HELP YOU LIVE LONGER. 
                     </h3>
-                    <div class="row">
-                        <div class="col-md-4" ng-controller="userinfo">
-                            <figure class="snip1336">
-                                <img ng-src="<?php echo $hostname; ?>{{User.Ubgimage}}" alt="sample87" />
-                                <b class="simple lastonline" >{{User.Ulastonline}}</b>
-                                <figcaption>
-                                    <img ng-src="<?php echo $hostname; ?>{{User.Upic}}" width="64" alt="profile-sample4" class="profile" />
-                                    <h2>{{User.Uname}}({{User.Urate}})<span>{{User.Jname}}</span></h2>
-                                    <p>{{User.Udiscription}}</p>
-                                </figcaption>
-                            </figure>
-
-                        </div>
-                        <div class="col-md-4" ng-controller="userinfo">
-                            <figure class="snip1336">
-                                <img ng-src="<?php echo $hostname; ?>{{User.Ubgimage}}" alt="sample87" />
-                                <b class="simple lastonline" >{{User.Ulastonline}}</b>
-                                <figcaption>
-                                    <img ng-src="<?php echo $hostname; ?>{{User.Upic}}" width="64" alt="profile-sample4" class="profile" />
-                                    <h2>{{User.Uname}}({{User.Urate}})<span>{{User.Jname}}</span></h2>
-                                    <p>{{User.Udiscription}}</p>
-                                </figcaption>
-                            </figure>
-
-                        </div>
-                        <div class="col-md-4" ng-controller="userinfo">
-                            <figure class="snip1336">
-                                <img ng-src="<?php echo $hostname; ?>{{User.Ubgimage}}" alt="sample87" />
-                                <b class="simple lastonline" >{{User.Ulastonline}}</b>
-                                <figcaption>
-                                    <img ng-src="<?php echo $hostname; ?>{{User.Upic}}" width="64" alt="profile-sample4" class="profile" />
-                                    <h2>{{User.Uname}}({{User.Urate}})<span>{{User.Jname}}</span></h2>
-                                    <p>{{User.Udiscription}}</p>
-                                </figcaption>
-                            </figure>
-
-                        </div>
-                    </div>
-                </center>
-            <?php } ?>
-        </div>
-        <footer class="footer text-center fix">
-            <div class="footer-above">
-                <div class="container">
-                    <div class="row">
-                        <div class="footer-col col-md-4">
-                            <h3>Location(HeadOffice)</h3>
-                            <p>99A,Kirulapana Av
-                                <br>Colombo 05</p>
-                        </div>
-                        <div class="footer-col col-md-4">
-                            <h3>Around the Web</h3>
-                            <ul class="list-inline">
-                                <li>
-                                    <a href="#" class="btn-social btn-outline"><i class="fa fa-fw fa-facebook"></i></a>
-                                </li>
-                                <li>
-                                    <a href="#" class="btn-social btn-outline"><i class="fa fa-fw fa-google-plus"></i></a>
-                                </li>
-                                <li>
-                                    <a href="#" class="btn-social btn-outline"><i class="fa fa-fw fa-twitter"></i></a>
-                                </li>
-                                <li>
-                                    <a href="#" class="btn-social btn-outline"><i class="fa fa-fw fa-linkedin"></i></a>
-                                </li>
-                                <li>
-                                    <a href="#" class="btn-social btn-outline"><i class="fa fa-fw fa-dribbble"></i></a>
-                                </li>
-                            </ul>
-                        </div>
-                        <div class="footer-col col-md-4">
-                            <h3>About Developer</h3>
-                            <p>Created By Thanura Nadun Ranasinghe.</p>
-                        </div>
-                    </div>
+                    <p>
+                        Want to extend your lifespan? Think about regularly assisting at a soup kitchen or coaching a basketball team at an at-risk high school. Research has shown that these kinds of activities can improve health in ways that can length your lifespan—volunteers show an improved ability to manage stress and stave off disease as well as reduced rates of depression and an increased sense of life satisfaction—when they were performed on a regular basis. This might be because volunteering alleviates loneliness and enhances our social lives—factors that can significantly affect our long-term health.  
+                    </p>
+                    <h3 style="text-align:center;" class="box-h3">
+                        2. ALTRUISM IS CONTAGIOUS. 
+                    </h3>
+                    <p>
+                        When one person performs a good deed, it causes a chain reaction of other altruistic acts. One study found that people are more likely to perform feats of generosity after observing another do the same. This effect can ripple throughout the community, inspiring dozens of individuals to make a difference.  
+                    </p>
+                    <h3 style="text-align:center;" class="box-h3">
+                        3. HELPING OTHERS MAKES US HAPPY. 
+                    </h3>
+                    <p>
+                        One team of sociologists tracked 2000 people over a five-year period and found that Americans who described themselves as “very happy” volunteered at least 5.8 hours per month. This heightened sense of well-being might be the byproduct of being more physically active as a result of volunteering, or because it makes us more socially active. Researchers also think that giving back might give individuals a mental boost by providing them with a neurochemical sense of reward. 
+                    </p>
+                    <h3 style="text-align:center;" class="box-h3">
+                        4. HELPING OTHERS MAY HELP WITH CHRONIC PAIN. 
+                    </h3>
+                    <p>
+                        According to one study, people who suffered from chronic pain tried working as peer volunteers. As a result, they experienced a reduction in their own symptoms. 
+                    </p>
+                    <h3 style="text-align:center;" class="box-h3">
+                        5. HELPING OTHERS LOWERS BLOOD PRESSURE. 
+                    </h3>
+                    <p>
+                        If you’re at risk for heart problems, your doctor has probably told you to cut back on red meat or the hours at your stressful job. However, you should also consider adding something to your routine: a regular volunteer schedule. One piece of research showed that older individuals who volunteered for at least 200 hours a year decreased their risk of hypertension by a whopping 40 percent. This could possibly be because they were provided with more social opportunities, which help relieve loneliness and the stress that often accompanies it.  
+                    </p>
+                    <h3 style="text-align:center;" class="box-h3">
+                        6. HELPING OTHERS PROMOTES POSITIVE BEHAVIORS IN TEENS. 
+                    </h3>
+                    <p>
+                        According to sociologists, teenagers who volunteer have better grades and self-image. 
+                    </p>
+                    <h3 style="text-align:center;" class="box-h3">
+                        7. HELPING OTHERS GIVES US A SENSE OF PURPOSE AND SATISFACTION. 
+                    </h3>
+                    <p>
+                        Looking for more meaning in your day-to-day existence? Studies show that volunteering enhances an individual’s overall sense of purpose and identity—particularly if they no longer hold a life-defining role like “worker” or “parent.” 
+                    </p>
                 </div>
-            </div>
-            <div class="footer-below">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-lg-12">
-                            Copyright © Help.IO 2017
+                <div class="parallax1" style="padding: 5%">
+                        <center>
+                            <h3 style="text-align:center;margin-bottom: 40px" class="box-h3">
+                                Top 3 Helpers
+                            </h3>
+                            <div class="row">
+                                <div class="col-md-4" ng-controller="userinfo">
+                                    <figure class="snip1336">
+                                        <img ng-src="<?php echo $hostname; ?>{{User.Ubgimage}}" alt="sample87" />
+                                        <b class="simple lastonline" >{{User.Ulastonline}}</b>
+                                        <figcaption>
+                                            <img ng-src="<?php echo $hostname; ?>{{User.Upic}}" width="64" alt="profile-sample4" class="profile" />
+                                            <h2>{{User.Uname}}({{User.Urate}})<span>{{User.Jname}}</span></h2>
+                                            <p>{{User.Udiscription}}</p>
+                                        </figcaption>
+                                    </figure>
+
+                                </div>
+                                <div class="col-md-4" ng-controller="userinfo">
+                                    <figure class="snip1336">
+                                        <img ng-src="<?php echo $hostname; ?>{{User.Ubgimage}}" alt="sample87" />
+                                        <b class="simple lastonline" >{{User.Ulastonline}}</b>
+                                        <figcaption>
+                                            <img ng-src="<?php echo $hostname; ?>{{User.Upic}}" width="64" alt="profile-sample4" class="profile" />
+                                            <h2>{{User.Uname}}({{User.Urate}})<span>{{User.Jname}}</span></h2>
+                                            <p>{{User.Udiscription}}</p>
+                                        </figcaption>
+                                    </figure>
+
+                                </div>
+                                <div class="col-md-4" ng-controller="userinfo">
+                                    <figure class="snip1336">
+                                        <img ng-src="<?php echo $hostname; ?>{{User.Ubgimage}}" alt="sample87" />
+                                        <b class="simple lastonline" >{{User.Ulastonline}}</b>
+                                        <figcaption>
+                                            <img ng-src="<?php echo $hostname; ?>{{User.Upic}}" width="64" alt="profile-sample4" class="profile" />
+                                            <h2>{{User.Uname}}({{User.Urate}})<span>{{User.Jname}}</span></h2>
+                                            <p>{{User.Udiscription}}</p>
+                                        </figcaption>
+                                    </figure>
+
+                                </div>
+                            </div>
+                        </center>
+                    <?php } ?>
+                </div>
+                <footer class="footer text-center fix">
+                    <div class="footer-above">
+                        <div class="container">
+                            <div class="row">
+                                <div class="footer-col col-md-4">
+                                    <h3>Location(HeadOffice)</h3>
+                                    <p>99A,Kirulapana Av
+                                        <br>Colombo 05</p>
+                                </div>
+                                <div class="footer-col col-md-4">
+                                    <h3>Around the Web</h3>
+                                    <ul class="list-inline">
+                                        <li>
+                                            <a href="#" class="btn-social btn-outline"><i class="fa fa-fw fa-facebook"></i></a>
+                                        </li>
+                                        <li>
+                                            <a href="#" class="btn-social btn-outline"><i class="fa fa-fw fa-google-plus"></i></a>
+                                        </li>
+                                        <li>
+                                            <a href="#" class="btn-social btn-outline"><i class="fa fa-fw fa-twitter"></i></a>
+                                        </li>
+                                        <li>
+                                            <a href="#" class="btn-social btn-outline"><i class="fa fa-fw fa-linkedin"></i></a>
+                                        </li>
+                                        <li>
+                                            <a href="#" class="btn-social btn-outline"><i class="fa fa-fw fa-dribbble"></i></a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="footer-col col-md-4">
+                                    <h3>About Developer</h3>
+                                    <p>Created By Thanura Nadun Ranasinghe.</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        </footer>
-    </body>    
-</html>
+                    <div class="footer-below">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    Copyright © Help.IO 2017
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </footer>
+            </body>    
+        </html>
