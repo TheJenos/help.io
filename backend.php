@@ -189,6 +189,28 @@ function searchHealper() {
 }
 
 //=====================RUN=====================//
+if (isset($_POST['ccemail'])) {
+    $data = SearchARow("`user`", array('*'), "`Uemail`='".antisqli($_POST['email'])."'");
+    if(isset($data)){
+        die("TRUE");
+    }else{
+        die("FALSE");
+    }
+}
+if (isset($_GET['caccout'])) {
+    $data = array(
+        "Uname"=>$_POST['uname'],
+        "Uemail"=>$_POST['email'],
+        "Upass"=>$_POST['upass'],
+        "Ubdate"=>$_POST['bday'],
+        "Ugen"=>$_POST['gen'],
+        "JID"=>$_POST['JID'],
+    );
+    Insert("`user`", $data);
+    $data1 = SearchARow("`user` NATURAL JOIN `jobs`", array('*', '(Urate/Uratetime) AS `Rate`'), " Uemail='" . antisqli($_POST['email']) . "' ");
+    $_SESSION['userdata'] = $data1;
+    header("Location: index.php");
+}
 if (isset($_GET['profile'])) {
     if($_FILES["pp"]['error']!='4'){
     $name = 'uploads/'.$_SESSION['userdata']['UID']."pp-".rand(0, 999999).".jpg";
