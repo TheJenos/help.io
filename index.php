@@ -289,6 +289,15 @@ if (isset($_GET['logout'])) {
                 txt = txt.substring(0, txt.length - 1);
                 return txt;
             }
+            function getskills() {
+                var txt = "";
+                var chips = $('.skills');
+                for (var i = 0; i < chips.length; i++) {
+                    txt += $(chips[i]).attr("indexid") + ",";
+                }
+                txt = txt.substring(0, txt.length - 1);
+                return txt;
+            }
             $(function() {
                 $('#error').hide();
                 $('.dialogbox').hide();
@@ -323,20 +332,20 @@ if (isset($_GET['logout'])) {
                     $interval(function() {
                         $scope.User = User;
                     }, 1000);
-                    $scope.updatepro = function(){
+                    $scope.updatepro = function() {
+                        $('#editprofile').fadeOut();
                         $.post("backend.php", {
                             "uname": "<?php echo $_SESSION['userdata']['Uemail']; ?>",
                             "upass": "<?php echo $_SESSION['userdata']['Upass']; ?>",
                             "want": "updatepro",
                             "user": $scope.Nuser,
+                            "skills": getskills(),
                             "json": true
                         }).done(function(response) {
-                            alert(response);
                             var result = $.parseJSON(response);
                             if (result.status == "Fail") {
                                 showError(result.msg);
                             }
-                            $('#editprofile').fadeOut();
                         });
                     }
                 });
@@ -484,6 +493,25 @@ if (isset($_GET['logout'])) {
 
                 });
 <?php } ?>
+            app.controller("tops", function($scope, $interval) {
+                $interval(function() {
+                    $.post("backend.php", {
+                        "uname": "tmp",
+                        "upass": "tmp",
+                        "top": "updatepro",
+                        "json": true
+                    }).done(function(response) {
+                        var result = $.parseJSON(response);
+                        if (result.status == "Fail") {
+                            showError(result.msg);
+                        }
+                        $.each(result.tops, function(index, value) {
+                            value.Ulastonline = ($.timeago(value.Ulastonline) == "Online ago") ? (value.Ustatus == "Online") ? "Online Now" : "Online But Away" : "Last Online " + $.timeago(value.Ulastonline);
+                        });
+                        $scope.result = result;
+                    });
+                },1000);
+            });
             app.controller("search", function($scope, $interval) {
                 $scope.find = "skill";
                 $scope.rand = "skill";
@@ -808,13 +836,48 @@ if (isset($_GET['logout'])) {
                                             <label for="pwd">Per Hour</label>
                                             <input type="text" name="username" class="form-control simple" id="user" ng-model="Nuser.Uperhour" autocomplete="off">
                                         </div>
+                                        <script>
+                                                var availableTags = [<?php
+            $sql = "SELECT * FROM `skills` WHERE `SID` NOT IN (SELECT `SID` FROM `skills_of_user` NATURAL JOIN `skills` WHERE `UID`='" . antisqli($_SESSION['userdata']['UID']) . "')";
+            $query = mysqli_query($con, $sql);
+
+            while ($row = mysqli_fetch_assoc($query)) {
+                echo '"' . $row['SID'] . ' - ' . $row['Sname'] . '",';
+            }
+            ?>""];
+                                                        $(function() {
+                                                            $("#tags").autocomplete({
+                                                                source: availableTags,
+                                                                select: function(event, ui) {
+                                                                    availableTags.splice(availableTags.indexOf(ui.item.value), 1);
+                                                                    $("#skills").append("<li class='simple skills' style='width:fit-content;display:block' indexid='" + ui.item.value.split(' - ')[0] + "' value='" + ui.item.value.split(' - ')[1] + "'>" + ui.item.value.split(' - ')[1] + " <i class='fa fa-times' onclick='removeskill(this);'></i></li>");
+                                                                    $("#tags").val("");
+                                                                    return false;
+                                                                }
+                                                            });
+                                                        });
+                                                function removeskill(ite) {
+                                                    availableTags.push($(ite).parent().attr('indexid') + " - " + $(ite).parent().attr('value'));
+                                                    $(ite).parent().remove();
+                                                }
+                                        </script>
+                                        <div class="form-group">
+                                            <label for="pwd">Skills</label>
+                                            <ul id="skills" style="padding:0px" >
+                                                <?php
+                                                $txt = "<li class='simple skills' style='width:fit-content;display:block' indexid='data-0' value='data-1' >data-1 <i class='fa fa-times' onclick='removeskill(this);'></i></li>";
+                                                echo SearchToItems("`skills_of_user` NATURAL JOIN `skills`", array('SID', 'Sname'), "`UID`='" . antisqli($_SESSION['userdata']['UID']) . "'", $txt, array('SID', 'Sname'));
+                                                ?>
+                                            </ul>
+                                            <input id="tags" class="form-control simple">
+                                        </div>
                                         <div class="form-group">
                                             <label for="pwd">Job</label>
                                             <select class="form-control simple" ng-model="Nuser.JID" >
-                                            <?php
-                                                $txt = "<option value='data-0'>data-1</option>";
-                                                echo SearchToItems("`jobs`", array('JID','Jname'), "1", $txt, array('JID','Jname'));
-                                            ?>
+                                                <?php
+                                                $txt = "<option  value='data-0'>data-1</option>";
+                                                echo SearchToItems("`jobs`", array('JID', 'Jname'), "1", $txt, array('JID', 'Jname'));
+                                                ?>
                                             </select>
                                         </div>
                                         <div style="text-align: right">
@@ -822,22 +885,22 @@ if (isset($_GET['logout'])) {
                                         </div>
                                     </form>
                                     <div class="col-md-6" style="text-align: left;">
-                                        <form  role="form" id="myform" action="backend.php" method="POST" novalidate="" >
+                                        <form  role="form" id="myform" action="backend.php?profile" method="POST" novalidate="" enctype="multipart/form-data">
                                             <div class="form-group">
                                                 <label for="email">Profile Picture</label>
-                                                <input type="file" name="username" class="form-control simple" id="user" ng-model="username" autocomplete="off">
+                                                <input type="file" name="pp" class="form-control simple" id="user" ng-model="username" autocomplete="off">
                                             </div>
                                             <div style="text-align: right">
-                                                <input type="button" id="loginbtn" name="login" class="simple" value="Upload">
+                                                <input type="submit" id="loginbtn" name="login" class="simple" value="Upload">
                                             </div>
                                         </form>
-                                        <form  role="form" id="myform" action="backend.php" method="POST" novalidate="" >
+                                        <form  role="form" id="myform" action="backend.php?bg" method="POST" novalidate=""  enctype="multipart/form-data">
                                             <div class="form-group">
                                                 <label for="email">Profile Banner Image</label>
-                                                <input type="file" name="username" class="form-control simple" id="user" ng-model="username" autocomplete="off">
+                                                <input type="file" name="bg" class="form-control simple" id="user" ng-model="username" autocomplete="off">
                                             </div>
                                             <div style="text-align: right">
-                                                <input type="button" id="loginbtn" name="login" class="simple" value="Upload">
+                                                <input type="submit" id="loginbtn" name="login" class="simple" value="Upload">
                                             </div>
                                         </form>
                                     </div>
@@ -849,193 +912,169 @@ if (isset($_GET['logout'])) {
                                 <img ng-src="<?php echo $hostname; ?>{{User.Ubgimage}}" alt="sample87" />
                                 <b class="simple lastonline" >{{User.Ulastonline}}</b>
                                 <b class="simple perhour" >${{User.Uperhour}} Per Hour </b>
-                                                 <figcaption>
-                                                     <img ng-src="<?php echo $hostname; ?>{{User.Upic}}" width="64" alt="profile-sample4" class="profile" />
-                                                     <h2>{{User.Uname}}({{User.Rate}})<span>{{User.Jname}}</span></h2>
-                                                     <p>{{User.Udiscription}}</p>
-                                                     <a href="#" style="width:100%" onclick="$('#editprofile').fadeIn();" class="">Edit Profile</a>
-                                                     </figcaption>
-                                                 </figure>
+                                <figcaption>
+                                    <img ng-src="<?php echo $hostname; ?>{{User.Upic}}" width="64" alt="profile-sample4" class="profile" />
+                                    <h2>{{User.Uname}}({{User.Rate}})<span>{{User.Jname}}</span></h2>
+                                    <p>{{User.Udiscription}}</p>
+                                    <a href="#" style="width:100%" onclick="$('#editprofile').fadeIn();" class="">Edit Profile</a>
+                                </figcaption>
+                            </figure>
 
-                                             </div>
-                                             <div class="col-md-8" ng-controller="trans">
-                                                 <div class="well" style="">
-                                                     <div style="display: inline-block;width: 100%;">
-                                                     <h4 class="float-left">My Wallet : ${{result.Wallet}}</h4>
-                                                     <h4 class="float-right">Transections Count : {{result.Count}}</h4> 
-                                                 </div>
-                                                 <hr style="animation: loader 2s;">
-                                                 <h3 style="margin-top:20px;margin-bottom: 10px;color:#2980b9">My Transections</h3>
-                                                     <table class="table table-responsive table-hover">
-                                                         <thead>
-                                                             <tr>
-                                                                 <th>Transections ID</th>
-                                                                 <th>Type</th>
-                                                                 <th>User</th>
-                                                                 <th>Transections Amount</th>
-                                                                 <th>Transections Date</th>
-                                                                 <th>Transections Time</th>
-                                                             </tr>
-                                                         </thead>
-                                                         <tbody>
-                                                             <tr ng-repeat="x in result.trans| orderBy : '-Tdatetime'" >
-                                                                 <td>{{x.TID}}</td>
-                                                                 <td>{{x.Ttype}}</td>
-                                                                 <td>{{x.Uname}}</td>
-                                                                 <td>${{x.Tamount}}</td>
-                                                                 <td>{{x.Tdatetime.split(" ")[0]}}</td>
-                                                                 <td>{{x.Tdatetime.split(" ")[1]}}</td>
-                                                             </tr>
-                                                         </tbody>
-                                                     </table>
-                                                 </div>
-                                             </div>
-                                </div>
-                            </div>
-                        <?php } else { ?>
-                            <center>
-                                <h3 class="box-h3" style="padding:20px;margin: 10%"><?php echo randQuotes(); ?></h3>
-
-                            </center>
                         </div>
-                        <div class="txtarea" style="">
-                            <p>
-                                Volunteering your time, money, or energy to help others doesn’t just make the world better—it also makes you better. Studies indicate that the very act of giving back to the community boosts your happiness, health, and sense of well-being. Here are seven scientific benefits of lending a hand to those in need. 
-                            </p>
-                            <h3 style="text-align:center;" class="box-h3">
-                            1. HELPING OTHERS CAN HELP YOU LIVE LONGER. 
-                        </h3>
-                        <p>
-                            Want to extend your lifespan? Think about regularly assisting at a soup kitchen or coaching a basketball team at an at-risk high school. Research has shown that these kinds of activities can improve health in ways that can length your lifespan—volunteers show an improved ability to manage stress and stave off disease as well as reduced rates of depression and an increased sense of life satisfaction—when they were performed on a regular basis. This might be because volunteering alleviates loneliness and enhances our social lives—factors that can significantly affect our long-term health.  
-                        </p>
-                        <h3 style="text-align:center;" class="box-h3">
-                            2. ALTRUISM IS CONTAGIOUS. 
-                        </h3>
-                        <p>
-                            When one person performs a good deed, it causes a chain reaction of other altruistic acts. One study found that people are more likely to perform feats of generosity after observing another do the same. This effect can ripple throughout the community, inspiring dozens of individuals to make a difference.  
-                        </p>
-                        <h3 style="text-align:center;" class="box-h3">
-                            3. HELPING OTHERS MAKES US HAPPY. 
-                        </h3>
-                        <p>
-                            One team of sociologists tracked 2000 people over a five-year period and found that Americans who described themselves as “very happy” volunteered at least 5.8 hours per month. This heightened sense of well-being might be the byproduct of being more physically active as a result of volunteering, or because it makes us more socially active. Researchers also think that giving back might give individuals a mental boost by providing them with a neurochemical sense of reward. 
-                        </p>
-                        <h3 style="text-align:center;" class="box-h3">
-                            4. HELPING OTHERS MAY HELP WITH CHRONIC PAIN. 
-                        </h3>
-                        <p>
-                            According to one study, people who suffered from chronic pain tried working as peer volunteers. As a result, they experienced a reduction in their own symptoms. 
-                        </p>
-                        <h3 style="text-align:center;" class="box-h3">
-                            5. HELPING OTHERS LOWERS BLOOD PRESSURE. 
-                        </h3>
-                        <p>
-                            If you’re at risk for heart problems, your doctor has probably told you to cut back on red meat or the hours at your stressful job. However, you should also consider adding something to your routine: a regular volunteer schedule. One piece of research showed that older individuals who volunteered for at least 200 hours a year decreased their risk of hypertension by a whopping 40 percent. This could possibly be because they were provided with more social opportunities, which help relieve loneliness and the stress that often accompanies it.  
-                        </p>
-                        <h3 style="text-align:center;" class="box-h3">
-                            6. HELPING OTHERS PROMOTES POSITIVE BEHAVIORS IN TEENS. 
-                        </h3>
-                        <p>
-                            According to sociologists, teenagers who volunteer have better grades and self-image. 
-                        </p>
-                        <h3 style="text-align:center;" class="box-h3">
-                            7. HELPING OTHERS GIVES US A SENSE OF PURPOSE AND SATISFACTION. 
-                        </h3>
-                        <p>
-                            Looking for more meaning in your day-to-day existence? Studies show that volunteering enhances an individual’s overall sense of purpose and identity—particularly if they no longer hold a life-defining role like “worker” or “parent.” 
-                        </p>
+                        <div class="col-md-8" ng-controller="trans">
+                            <div class="well" style="">
+                                <div style="display: inline-block;width: 100%;">
+                                    <h4 class="float-left">My Wallet : ${{result.Wallet}}</h4>
+                                    <h4 class="float-right">Transections Count : {{result.Count}}</h4> 
+                                </div>
+                                <hr style="animation: loader 2s;">
+                                <h3 style="margin-top:20px;margin-bottom: 10px;color:#2980b9">My Transections</h3>
+                                <table class="table table-responsive table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Transections ID</th>
+                                            <th>Type</th>
+                                            <th>User</th>
+                                            <th>Transections Amount</th>
+                                            <th>Transections Date</th>
+                                            <th>Transections Time</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="x in result.trans| orderBy : '-Tdatetime'" >
+                                            <td>{{x.TID}}</td>
+                                            <td>{{x.Ttype}}</td>
+                                            <td>{{x.Uname}}</td>
+                                            <td>${{x.Tamount}}</td>
+                                            <td>{{x.Tdatetime.split(" ")[0]}}</td>
+                                            <td>{{x.Tdatetime.split(" ")[1]}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
-                    <div class="parallax1" style="padding: 5%">
-                            <center>
-                                <h3 style="text-align:center;margin-bottom: 40px" class="box-h3">
-                                    Top 3 Helpers
-                                </h3>
-                                <div class="row">
-                                    <div class="col-md-4" ng-controller="userinfo">
-                                        <figure class="snip1336">
-                                            <img ng-src="<?php echo $hostname; ?>{{User.Ubgimage}}" alt="sample87" />
-                                            <b class="simple lastonline" >{{User.Ulastonline}}</b>
-                                            <figcaption>
-                                                <img ng-src="<?php echo $hostname; ?>{{User.Upic}}" width="64" alt="profile-sample4" class="profile" />
-                                                <h2>{{User.Uname}}({{User.Urate}})<span>{{User.Jname}}</span></h2>
-                                                <p>{{User.Udiscription}}</p>
-                                            </figcaption>
-                                        </figure>
+                </div>
+            <?php } else { ?>
+                <center>
+                    <h3 class="box-h3" style="padding:20px;margin: 10%"><?php echo randQuotes(); ?></h3>
 
-                                    </div>
-                                    <div class="col-md-4" ng-controller="userinfo">
-                                        <figure class="snip1336">
-                                            <img ng-src="<?php echo $hostname; ?>{{User.Ubgimage}}" alt="sample87" />
-                                            <b class="simple lastonline" >{{User.Ulastonline}}</b>
-                                            <figcaption>
-                                                <img ng-src="<?php echo $hostname; ?>{{User.Upic}}" width="64" alt="profile-sample4" class="profile" />
-                                                <h2>{{User.Uname}}({{User.Urate}})<span>{{User.Jname}}</span></h2>
-                                                <p>{{User.Udiscription}}</p>
-                                            </figcaption>
-                                        </figure>
+                </center>
+            </div>
+            <div class="txtarea" style="">
+                <p>
+                    Volunteering your time, money, or energy to help others doesn’t just make the world better—it also makes you better. Studies indicate that the very act of giving back to the community boosts your happiness, health, and sense of well-being. Here are seven scientific benefits of lending a hand to those in need. 
+                </p>
+                <h3 style="text-align:center;" class="box-h3">
+                    1. HELPING OTHERS CAN HELP YOU LIVE LONGER. 
+                </h3>
+                <p>
+                    Want to extend your lifespan? Think about regularly assisting at a soup kitchen or coaching a basketball team at an at-risk high school. Research has shown that these kinds of activities can improve health in ways that can length your lifespan—volunteers show an improved ability to manage stress and stave off disease as well as reduced rates of depression and an increased sense of life satisfaction—when they were performed on a regular basis. This might be because volunteering alleviates loneliness and enhances our social lives—factors that can significantly affect our long-term health.  
+                </p>
+                <h3 style="text-align:center;" class="box-h3">
+                    2. ALTRUISM IS CONTAGIOUS. 
+                </h3>
+                <p>
+                    When one person performs a good deed, it causes a chain reaction of other altruistic acts. One study found that people are more likely to perform feats of generosity after observing another do the same. This effect can ripple throughout the community, inspiring dozens of individuals to make a difference.  
+                </p>
+                <h3 style="text-align:center;" class="box-h3">
+                    3. HELPING OTHERS MAKES US HAPPY. 
+                </h3>
+                <p>
+                    One team of sociologists tracked 2000 people over a five-year period and found that Americans who described themselves as “very happy” volunteered at least 5.8 hours per month. This heightened sense of well-being might be the byproduct of being more physically active as a result of volunteering, or because it makes us more socially active. Researchers also think that giving back might give individuals a mental boost by providing them with a neurochemical sense of reward. 
+                </p>
+                <h3 style="text-align:center;" class="box-h3">
+                    4. HELPING OTHERS MAY HELP WITH CHRONIC PAIN. 
+                </h3>
+                <p>
+                    According to one study, people who suffered from chronic pain tried working as peer volunteers. As a result, they experienced a reduction in their own symptoms. 
+                </p>
+                <h3 style="text-align:center;" class="box-h3">
+                    5. HELPING OTHERS LOWERS BLOOD PRESSURE. 
+                </h3>
+                <p>
+                    If you’re at risk for heart problems, your doctor has probably told you to cut back on red meat or the hours at your stressful job. However, you should also consider adding something to your routine: a regular volunteer schedule. One piece of research showed that older individuals who volunteered for at least 200 hours a year decreased their risk of hypertension by a whopping 40 percent. This could possibly be because they were provided with more social opportunities, which help relieve loneliness and the stress that often accompanies it.  
+                </p>
+                <h3 style="text-align:center;" class="box-h3">
+                    6. HELPING OTHERS PROMOTES POSITIVE BEHAVIORS IN TEENS. 
+                </h3>
+                <p>
+                    According to sociologists, teenagers who volunteer have better grades and self-image. 
+                </p>
+                <h3 style="text-align:center;" class="box-h3">
+                    7. HELPING OTHERS GIVES US A SENSE OF PURPOSE AND SATISFACTION. 
+                </h3>
+                <p>
+                    Looking for more meaning in your day-to-day existence? Studies show that volunteering enhances an individual’s overall sense of purpose and identity—particularly if they no longer hold a life-defining role like “worker” or “parent.” 
+                </p>
+            </div>
+            <div class="parallax1" style="padding: 5%">
+                <center>
+                    <h3 style="text-align:center;margin-bottom: 40px" class="box-h3">
+                        Top 10 Helpers
+                    </h3>
+                    <div class="row" ng-controller="tops" >
+                        <div ng-repeat="y in result.tops" class="col-md-4" >
+                            <figure class="snip1336">
+                                <img ng-src="<?php echo $hostname; ?>{{y.Ubgimage}}" alt="sample87" />
+                                <b class="simple lastonline" >{{y.Ulastonline}}</b>
+                                <figcaption>
+                                    <img ng-src="<?php echo $hostname; ?>{{y.Upic}}" width="64" alt="profile-sample4" class="profile" />
+                                    <h2>{{y.Uname}}({{y.Urate}})<span>{{y.Jname}}</span></h2>
+                                    <p>{{y.Udiscription}}</p>
+                                </figcaption>
+                            </figure>
 
-                                    </div>
-                                    <div class="col-md-4" ng-controller="userinfo">
-                                        <figure class="snip1336">
-                                            <img ng-src="<?php echo $hostname; ?>{{User.Ubgimage}}" alt="sample87" />
-                                            <b class="simple lastonline" >{{User.Ulastonline}}</b>
-                                            <figcaption>
-                                                <img ng-src="<?php echo $hostname; ?>{{User.Upic}}" width="64" alt="profile-sample4" class="profile" />
-                                                <h2>{{User.Uname}}({{User.Urate}})<span>{{User.Jname}}</span></h2>
-                                                <p>{{User.Udiscription}}</p>
-                                            </figcaption>
-                                        </figure>
-
-                                    </div>
-                                </div>
-                            </center>
-                        <?php } ?>
+                        </div>
                     </div>
-                    <footer class="footer text-center fix">
-                        <div class="footer-above">
-                            <div class="container">
-                                <div class="row">
-                                    <div class="footer-col col-md-4">
-                                        <h3>Location(HeadOffice)</h3>
-                                        <p>99A,Kirulapana Av
-                                            <br>Colombo 05</p>
-                                    </div>
-                                    <div class="footer-col col-md-4">
-                                        <h3>Around the Web</h3>
-                                        <ul class="list-inline">
-                                            <li>
-                                                <a href="#" class="btn-social btn-outline"><i class="fa fa-fw fa-facebook"></i></a>
-                                            </li>
-                                            <li>
-                                                <a href="#" class="btn-social btn-outline"><i class="fa fa-fw fa-google-plus"></i></a>
-                                            </li>
-                                            <li>
-                                                <a href="#" class="btn-social btn-outline"><i class="fa fa-fw fa-twitter"></i></a>
-                                            </li>
-                                            <li>
-                                                <a href="#" class="btn-social btn-outline"><i class="fa fa-fw fa-linkedin"></i></a>
-                                            </li>
-                                            <li>
-                                                <a href="#" class="btn-social btn-outline"><i class="fa fa-fw fa-dribbble"></i></a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <div class="footer-col col-md-4">
-                                        <h3>About Developer</h3>
-                                        <p>Created By Thanura Nadun Ranasinghe.</p>
-                                    </div>
-                                </div>
-                            </div>
+                </center>
+            <?php } ?>
+        </div>
+        <footer class="footer text-center fix">
+            <div class="footer-above">
+                <div class="container">
+                    <div class="row">
+                        <div class="footer-col col-md-4">
+                            <h3>Location(HeadOffice)</h3>
+                            <p>99A,Kirulapana Av
+                                <br>Colombo 05</p>
                         </div>
-                        <div class="footer-below">
-                            <div class="container">
-                                <div class="row">
-                                    <div class="col-lg-12">
-                                        Copyright © Help.IO 2017
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="footer-col col-md-4">
+                            <h3>Around the Web</h3>
+                            <ul class="list-inline">
+                                <li>
+                                    <a href="#" class="btn-social btn-outline"><i class="fa fa-fw fa-facebook"></i></a>
+                                </li>
+                                <li>
+                                    <a href="#" class="btn-social btn-outline"><i class="fa fa-fw fa-google-plus"></i></a>
+                                </li>
+                                <li>
+                                    <a href="#" class="btn-social btn-outline"><i class="fa fa-fw fa-twitter"></i></a>
+                                </li>
+                                <li>
+                                    <a href="#" class="btn-social btn-outline"><i class="fa fa-fw fa-linkedin"></i></a>
+                                </li>
+                                <li>
+                                    <a href="#" class="btn-social btn-outline"><i class="fa fa-fw fa-dribbble"></i></a>
+                                </li>
+                            </ul>
                         </div>
-                    </footer>
-                </body>    
-            </html>
+                        <div class="footer-col col-md-4">
+                            <h3>About Developer</h3>
+                            <p>Created By Thanura Nadun Ranasinghe.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-below">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            Copyright © Help.IO 2017
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </body>    
+</html>

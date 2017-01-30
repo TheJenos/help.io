@@ -32,8 +32,8 @@ $quotes = array(
     );
 //======================funtions===============================//
 function logit($param) {
-    $newtxt = file_get_contents('logs/'.date("Y-m-d").$GLOBALS['logfile']) . "\n" . $param;
-    file_put_contents('logs/'.date("Y-m-d").$GLOBALS['logfile'], $newtxt);
+    //$newtxt = file_get_contents('logs/'.date("Y-m-d").$GLOBALS['logfile']) . "\n" . $param;
+    //file_put_contents('logs/'.date("Y-m-d").$GLOBALS['logfile'], $newtxt);
 }
 function mylogit($param) {
     $newtxt = file_get_contents('logs/'.date("Y-m-d")."Mylog.txt") . "\n" . $param;

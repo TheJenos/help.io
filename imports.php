@@ -8,6 +8,8 @@
 <script src="js/jquery.barrating.js" type="text/javascript"></script>
 <script src="js/angular.min.js" type="text/javascript"></script>
 <link rel="stylesheet" type="text/css" href="css/freelancer.min.css">
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
 <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
 <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Noto+Sans:400,400italic,700,700italic">
@@ -354,6 +356,9 @@
     }
     .dialogbox .form-group {
          margin-bottom: 0px;
+    }
+    .ui-autocomplete{
+        z-index: 99999999999;
     }
     @media (max-width: 767px) {
         .navbar-default .navbar-nav .open .dropdown-menu>li>a {

@@ -52,9 +52,24 @@ function requestforhealp() {
     Insert("helprequest", $resquest);
 }
 
-function updatepro(){
-    $data = $_POST['user'];
+function updatepro() {
+    $datapack = $_POST['user'];
+    $data = array(
+        "Uname" => $datapack['Uname'],
+        "Udiscription" => $datapack['Udiscription'],
+        "Uperhour" => $datapack['Uperhour'],
+        "JID" => $datapack['JID']
+    );
     Update("`user`", $data, "UID='" . antisqli($GLOBALS['myprofile']['UID']) . "'");
+    Delete("`skills_of_user`", "`UID`='" . antisqli($GLOBALS['myprofile']['UID']) . "'");
+    $data = explode(",", $_POST['skills']);
+    foreach ($data as $value) {
+        $row = array(
+            'UID' => $GLOBALS['myprofile']['UID'],
+            'SID' => $value
+        );
+        Insert("`skills_of_user`", $row);
+    }
 }
 
 function cancelrequest() {
@@ -143,6 +158,11 @@ function gethelp() {
     $GLOBALS['json']['data'] = $data;
 }
 
+function tophelpers(){
+    $data = SearchARows("`user`",array('*', '(Urate/Uratetime) AS `Rate`'),"1 ORDER BY `Rate` DESC LIMIT 10");
+    $GLOBALS['json']['tops'] = $data;
+}
+
 function searchHealper() {
     if (isset($_POST['search']) && $_POST['search'] != "") {
         if ($_POST['find'] == "job") {
@@ -169,6 +189,24 @@ function searchHealper() {
 }
 
 //=====================RUN=====================//
+if (isset($_GET['profile'])) {
+    if($_FILES["pp"]['error']!='4'){
+    $name = 'uploads/'.$_SESSION['userdata']['UID']."pp-".rand(0, 999999).".jpg";
+    $data1 = array('Upic' => $name);
+    Update("`user`", $data1, "UID='" . antisqli($_SESSION['userdata']['UID']) . "'");
+    move_uploaded_file($_FILES["pp"]["tmp_name"], $name);
+    }
+    header("Location: index.php?profile");
+}
+if (isset($_GET['bg'])) {
+    if($_FILES["bg"]['error']!='4'){
+    $name = 'uploads/'.$_SESSION['userdata']['UID']."bg-".rand(0, 999999).".jpg";
+    $data1 = array('Ubgimage' => $name);
+    Update("`user`", $data1, "UID='" . antisqli($_SESSION['userdata']['UID']) . "'");
+    move_uploaded_file($_FILES["bg"]["tmp_name"], $name);
+    }
+    header("Location: index.php?profile");
+}
 if (isset($_POST['json'])) {
     if (!isset($_POST['uname'])) {
         fail("Username Missing");
@@ -180,6 +218,10 @@ if (isset($_POST['json'])) {
         if (isset($_POST['search'])) {
             $myprofile = array("UID" => "tmp");
             searchHealper();
+        }
+        if (isset($_POST['top'])) {
+            $myprofile = array("UID" => "tmp");
+            tophelpers();
         }
         exitWithPrint();
     }
