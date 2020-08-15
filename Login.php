@@ -3,7 +3,7 @@
 include './config.php';
 CookieLogin();
 if (isset($_SESSION['userdata'])) {
-    header("Location: index.php");
+    header('Location: index.php');
 }
 ?>
 <html>
@@ -137,7 +137,7 @@ if (isset($_SESSION['userdata'])) {
                                 <select name="JID" class="form-control simple"  >
                                     <?php
                                     $txt = "<option value='data-0'>data-1</option>";
-                                    echo SearchToItems("`jobs`", array('JID', 'Jname'), "1", $txt, array('JID', 'Jname'));
+                                    echo SearchToItems('`jobs`', ['JID', 'Jname'], '1', $txt, ['JID', 'Jname']);
                                     ?>
                                 </select>
                             </div>

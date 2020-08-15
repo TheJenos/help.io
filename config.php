@@ -9,98 +9,112 @@ $logfile = 'log.txt';
 $key = hex2bin('000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f');
 $con = mysqli_connect($host, $root, $pass, $database);
 if (!$con) {
-    logit("Connection Error");
+    logit('Connection Error');
 }
 error_reporting(E_ALL ^ E_WARNING);
 session_start();
-$bgimages = array();
+$bgimages = [];
 if ($handle = opendir('images/bg/')) {
     while (false !== ($entry = readdir($handle))) {
-        if ($entry != "." && $entry != "..") {
+        if ($entry != '.' && $entry != '..') {
             array_push($bgimages, $entry);
         }
     }
     closedir($handle);
 }
-$quotes = array(
-    "“The purpose of life is not to be happy. It is to be useful, to be honorable, to be compassionate, to have it make some difference that you have lived and lived well.”</br>― Ralph Waldo Emerson",
-    "“No one has ever become poor by giving.”<br>― Anne Frank, diary of Anne Frank: the play",
-    "“No one is useless in this world who lightens the burdens of another.”<br>― Charles Dickens",
-    "“When we give cheerfully and accept gratefully, everyone is blessed.” <br>― Maya Angelou",
-    "“You have not lived today until you have done something for someone who can never repay you.” <br>― John Bunyan",
-    "“He has a right to criticize, who has a heart to help.” <br>― Abraham Lincoln",
-    );
+$quotes = [
+    '“The purpose of life is not to be happy. It is to be useful, to be honorable, to be compassionate, to have it make some difference that you have lived and lived well.”</br>― Ralph Waldo Emerson',
+    '“No one has ever become poor by giving.”<br>― Anne Frank, diary of Anne Frank: the play',
+    '“No one is useless in this world who lightens the burdens of another.”<br>― Charles Dickens',
+    '“When we give cheerfully and accept gratefully, everyone is blessed.” <br>― Maya Angelou',
+    '“You have not lived today until you have done something for someone who can never repay you.” <br>― John Bunyan',
+    '“He has a right to criticize, who has a heart to help.” <br>― Abraham Lincoln',
+];
 //======================funtions===============================//
-function logit($param) {
+function logit($param)
+{
     //$newtxt = file_get_contents('logs/'.date("Y-m-d").$GLOBALS['logfile']) . "\n" . $param;
     //file_put_contents('logs/'.date("Y-m-d").$GLOBALS['logfile'], $newtxt);
 }
-function mylogit($param) {
-    $newtxt = file_get_contents('logs/'.date("Y-m-d")."Mylog.txt") . "\n" . $param;
-    file_put_contents('logs/'.date("Y-m-d")."Mylog.txt", $newtxt);
+function mylogit($param)
+{
+    $newtxt = file_get_contents('logs/'.date('Y-m-d').'Mylog.txt')."\n".$param;
+    file_put_contents('logs/'.date('Y-m-d').'Mylog.txt', $newtxt);
 }
 
-function hostname() {
+function hostname()
+{
     echo $hostname;
 }
 
-function debug($txt) {
-    echo '<h1>' . $txt . '</h1>';
+function debug($txt)
+{
+    echo '<h1>'.$txt.'</h1>';
 }
 
-function myencyption($txt) {
+function myencyption($txt)
+{
     return crypt($txt, '$1$rasmusle$');
 }
 
-function randImages() {
-    if(count($GLOBALS['bgimages'])>0) {
+function randImages()
+{
+    if (count($GLOBALS['bgimages']) > 0) {
         $randval = rand(0, count($GLOBALS['bgimages']) - 1);
         $val = $GLOBALS['bgimages'][$randval];
         array_splice($GLOBALS['bgimages'], $randval, 1);
+
         return $val;
     } else {
-        return FALSE;
+        return false;
     }
 }
-function randQuotes() {
-    if(count($GLOBALS['quotes'])>0) {
+function randQuotes()
+{
+    if (count($GLOBALS['quotes']) > 0) {
         $randval = rand(0, count($GLOBALS['quotes']) - 1);
         $val = $GLOBALS['quotes'][$randval];
         array_splice($GLOBALS['quotes'], $randval, 1);
+
         return $val;
     } else {
-        return FALSE;
+        return false;
     }
 }
 
 //=============================validations==========================//
-function validateNIC($nic) {
-    $final = TRUE;
+function validateNIC($nic)
+{
+    $final = true;
     if (strlen($nic) == 10) {
-        if (!(substr($nic, strlen($nic) - 1, 1) == "v" || substr($nic, strlen($nic) - 1, 1) == "V")) {
-            $final = FALSE;
+        if (!(substr($nic, strlen($nic) - 1, 1) == 'v' || substr($nic, strlen($nic) - 1, 1) == 'V')) {
+            $final = false;
         }
-    } else if (strlen($nic) == 12) {
-        $final = TRUE;
+    } elseif (strlen($nic) == 12) {
+        $final = true;
     } else {
-        $final = FALSE;
+        $final = false;
     }
+
     return $final;
 }
 
-function validateLenth($txt, $len) {
+function validateLenth($txt, $len)
+{
     return strlen($txt) > 1 && strlen($txt) <= $len;
 }
 
 //============================Imports===============================//
-function links() {
-    echo file_get_contents("imports.php");
+function links()
+{
+    echo file_get_contents('imports.php');
 }
 
 //===========================Login With Cookie===============================//
-function CookieLogin() {
+function CookieLogin()
+{
     if (isset($_COOKIE['username'])) {
-        $data = SearchARow("`user` NATURAL JOIN `jobs`", array('*','(Urate/Uratetime) AS `Rate`'), " Uemail='" . antisqli($_COOKIE['username']) . "' ");
+        $data = SearchARow('`user` NATURAL JOIN `jobs`', ['*', '(Urate/Uratetime) AS `Rate`'], " Uemail='".antisqli($_COOKIE['username'])."' ");
         if (!isset($data)) {
             session_destroy();
         }
@@ -108,116 +122,130 @@ function CookieLogin() {
             $user = $data;
             $user['Upass'] = myencyption($data['Upass']);
             $_SESSION['userdata'] = $user;
-            setcookie('username', $_SESSION['userdata']['Uemail'], time() + 60 * 60 * 24 * 14, "/");
-            setcookie('userpass', $_SESSION['userdata']['Upass'], time() + 60 * 60 * 24 * 14, "/");
-            logit("Cookie Login Pass " . $_COOKIE['username']);
+            setcookie('username', $_SESSION['userdata']['Uemail'], time() + 60 * 60 * 24 * 14, '/');
+            setcookie('userpass', $_SESSION['userdata']['Upass'], time() + 60 * 60 * 24 * 14, '/');
+            logit('Cookie Login Pass '.$_COOKIE['username']);
         } else {
-            logit("Cookie Login Fail " . $_COOKIE['username']);
+            logit('Cookie Login Fail '.$_COOKIE['username']);
         }
     }
 }
 
 //=========================================DBMS=======================//
-function antisqli($param) {
+function antisqli($param)
+{
     return str_replace("'", "''", $param);
 }
 
-function Insert($table, $data) {
+function Insert($table, $data)
+{
     $conn = $GLOBALS['con'];
-    $cols = "(";
-    $rows = "(";
+    $cols = '(';
+    $rows = '(';
     foreach ($data as $key => $value) {
-        $cols .= '`' . $key . '`,';
-        $rows .= "'" . antisqli($value) . "',";
+        $cols .= '`'.$key.'`,';
+        $rows .= "'".antisqli($value)."',";
     }
     $cols = substr($cols, 0, strlen($cols) - 1);
     $rows = substr($rows, 0, strlen($rows) - 1);
-    $cols .= ")";
-    $rows .= ")";
+    $cols .= ')';
+    $rows .= ')';
     $query = "INSERT INTO $table $cols VALUES $rows";
     logit($query);
+
     return mysqli_query($conn, $query);
 }
 
-function excquery($query){
+function excquery($query)
+{
     $conn = $GLOBALS['con'];
     logit($query);
+
     return mysqli_query($conn, $query);
 }
 
-function Update($table, $data, $where) {
+function Update($table, $data, $where)
+{
     $conn = $GLOBALS['con'];
-    $cols = "";
+    $cols = '';
     foreach ($data as $key => $value) {
-        $value = ($value=="CURRENT_TIMESTAMP")?"CURRENT_TIMESTAMP":("'".antisqli($value)."'");
-        $cols .= '`' . $key . "`=".$value.",";
+        $value = ($value == 'CURRENT_TIMESTAMP') ? 'CURRENT_TIMESTAMP' : ("'".antisqli($value)."'");
+        $cols .= '`'.$key.'`='.$value.',';
     }
     $cols = substr($cols, 0, strlen($cols) - 1);
     $query = "UPDATE $table SET $cols WHERE $where";
     logit($query);
+
     return mysqli_query($conn, $query);
 }
 
-function Delete($table, $where) {
+function Delete($table, $where)
+{
     $conn = $GLOBALS['con'];
     $query = "DELETE FROM $table WHERE $where";
     logit($query);
+
     return mysqli_query($conn, $query);
 }
 
-function mySearchARow($table, $rows, $where) {
+function mySearchARow($table, $rows, $where)
+{
     $con = $GLOBALS['con'];
-    $cols = "";
+    $cols = '';
     foreach ($rows as $key => $value) {
         $cols .= "$value,";
     }
     $cols = substr($cols, 0, strlen($cols) - 1);
-    $query = "SELECT " . $cols . " FROM $table WHERE $where";
+    $query = 'SELECT '.$cols." FROM $table WHERE $where";
     $result = mysqli_query($con, $query);
     mylogit($query);
     if (mysqli_num_rows($result) > 0) {
         return mysqli_fetch_assoc($result);
     }
 }
-function SearchARow($table, $rows, $where) {
+function SearchARow($table, $rows, $where)
+{
     $con = $GLOBALS['con'];
-    $cols = "";
+    $cols = '';
     foreach ($rows as $key => $value) {
         $cols .= "$value,";
     }
     $cols = substr($cols, 0, strlen($cols) - 1);
-    $query = "SELECT " . $cols . " FROM $table WHERE $where";
+    $query = 'SELECT '.$cols." FROM $table WHERE $where";
     $result = mysqli_query($con, $query);
     logit($query);
     if (mysqli_num_rows($result) > 0) {
         return mysqli_fetch_assoc($result);
     }
 }
-function SearchARows($table, $rows, $where) {
+function SearchARows($table, $rows, $where)
+{
     $con = $GLOBALS['con'];
-    $cols = "";
+    $cols = '';
     foreach ($rows as $key => $value) {
         $cols .= "$value,";
     }
     $cols = substr($cols, 0, strlen($cols) - 1);
-    $query = "SELECT " . $cols . " FROM $table WHERE $where";
+    $query = 'SELECT '.$cols." FROM $table WHERE $where";
     logit($query);
     $result = mysqli_query($con, $query);
-    $datalines = array();
+    $datalines = [];
     while ($row = mysqli_fetch_assoc($result)) {
         array_push($datalines, $row);
     }
+
     return $datalines;
 }
 
-function SearchToItems($table, $rows, $where, $pattern, $id) {
+function SearchToItems($table, $rows, $where, $pattern, $id)
+{
     $con = $GLOBALS['con'];
-    $cols = "";
+    $cols = '';
     foreach ($rows as $key => $value) {
         $cols .= "$value,";
     }
     $cols = substr($cols, 0, strlen($cols) - 1);
-    $query = "SELECT " . $cols . " FROM $table WHERE $where";
+    $query = 'SELECT '.$cols." FROM $table WHERE $where";
     $result = mysqli_query($con, $query);
     logit($query);
     if (mysqli_num_rows($result) > 0) {
@@ -231,37 +259,38 @@ function SearchToItems($table, $rows, $where, $pattern, $id) {
     }
 }
 
-function SearchToTable($table, $rows, $where, $id, $removebtn, $updatebtn) {
+function SearchToTable($table, $rows, $where, $id, $removebtn, $updatebtn)
+{
     $con = $GLOBALS['con'];
-    $cols = "";
-    $ths = "";
-    $tr = "<tr>";
+    $cols = '';
+    $ths = '';
+    $tr = '<tr>';
     foreach ($rows as $key => $value) {
         $cols .= "$key,";
         $ths .= "<th>$value</th>";
     }
     $tr .= "$ths";
     if (isset($updatebtn)) {
-        $tr .= "<th>Update</th>";
+        $tr .= '<th>Update</th>';
     }
     if (isset($removebtn)) {
-        $tr .= "<th>Remove</th>";
+        $tr .= '<th>Remove</th>';
     }
-    $tr .= "</tr>";
+    $tr .= '</tr>';
     $cols = substr($cols, 0, strlen($cols) - 1);
-    $query = "SELECT " . $cols . " FROM $table WHERE $where";
+    $query = 'SELECT '.$cols." FROM $table WHERE $where";
     $result = mysqli_query($con, $query);
     if (mysqli_num_rows($result) > 0) {
         while ($rowss = mysqli_fetch_assoc($result)) {
-            $tds = "";
+            $tds = '';
             foreach ($rows as $key => $value) {
-                $tds .= "<td>" . $rowss[$key] . "</td>";
+                $tds .= '<td>'.$rowss[$key].'</td>';
             }
             if (isset($updatebtn)) {
-                $tds .= "<td>" . str_replace("did", $rowss[$id], $updatebtn) . "</td>";
+                $tds .= '<td>'.str_replace('did', $rowss[$id], $updatebtn).'</td>';
             }
             if (isset($removebtn)) {
-                $tds .= "<td>" . str_replace("did", $rowss[$id], $removebtn) . "</td>";
+                $tds .= '<td>'.str_replace('did', $rowss[$id], $removebtn).'</td>';
             }
             $tr .= "<tr>$tds</tr>";
         }
