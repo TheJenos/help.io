@@ -4,13 +4,13 @@ include './config.php';
 CookieLogin();
 if (isset($_GET['logout'])) {
     session_destroy();
-    setcookie('username', '', 0, "/");
-    setcookie('userpass', '', 0, "/");
-    header("Location: index.php");
-} else if (isset($_GET['status'])) {
-    $data = array('Ustatus' => $_GET['status']);
-    Update("`user`", $data, "UID='" . antisqli($_SESSION['userdata']['UID']) . "'");
-    header("Location: index.php?profile");
+    setcookie('username', '', 0, '/');
+    setcookie('userpass', '', 0, '/');
+    header('Location: index.php');
+} elseif (isset($_GET['status'])) {
+    $data = ['Ustatus' => $_GET['status']];
+    Update('`user`', $data, "UID='".antisqli($_SESSION['userdata']['UID'])."'");
+    header('Location: index.php?profile');
 }
 ?>
 <html>
@@ -257,7 +257,7 @@ if (isset($_GET['logout'])) {
             var app = angular.module("home", []);
             var sellect = "skill";
             var wallet = 0;
-            var datas = '<?php echo (isset($_SESSION['userdata'])) ? json_encode($_SESSION['userdata']) : "{}"; ?>';
+            var datas = '<?php echo (isset($_SESSION['userdata'])) ? json_encode($_SESSION['userdata']) : '{}'; ?>';
             var User = $.parseJSON(datas);
             function showError($txt) {
                 if ($txt != 'no') {
@@ -307,8 +307,8 @@ if (isset($_GET['logout'])) {
 <?php if (isset($_SESSION['userdata'])) { ?>
                     setInterval(function() {
                         $.post("backend.php", {
-                            "uname": "<?php echo isset($_SESSION['userdata']) ? $_SESSION['userdata']['Uemail'] : "tmp"; ?>",
-                            "upass": "<?php echo isset($_SESSION['userdata']) ? $_SESSION['userdata']['Upass'] : "tmp"; ?>",
+                            "uname": "<?php echo isset($_SESSION['userdata']) ? $_SESSION['userdata']['Uemail'] : 'tmp'; ?>",
+                            "upass": "<?php echo isset($_SESSION['userdata']) ? $_SESSION['userdata']['Upass'] : 'tmp'; ?>",
                             "want": "userinfo",
                             "json": true
                         }).done(function(response) {
@@ -543,8 +543,8 @@ if (isset($_GET['logout'])) {
                 }
                 $scope.sendrequest = function() {
                     $.post("backend.php", {
-                        "uname": "<?php echo isset($_SESSION['userdata']) ? $_SESSION['userdata']['Uemail'] : "tmp"; ?>",
-                        "upass": "<?php echo isset($_SESSION['userdata']) ? $_SESSION['userdata']['Upass'] : "tmp"; ?>",
+                        "uname": "<?php echo isset($_SESSION['userdata']) ? $_SESSION['userdata']['Uemail'] : 'tmp'; ?>",
+                        "upass": "<?php echo isset($_SESSION['userdata']) ? $_SESSION['userdata']['Upass'] : 'tmp'; ?>",
                         "want": "requestforhealp",
                         "who": $scope.Suser.UID,
                         "time": $scope.time,
@@ -563,8 +563,8 @@ if (isset($_GET['logout'])) {
                 $scope.searcharc = function() {
                     sellect = $scope.find;
                     $.post("backend.php", {
-                        "uname": "<?php echo isset($_SESSION['userdata']) ? $_SESSION['userdata']['Uemail'] : "tmp"; ?>",
-                        "upass": "<?php echo isset($_SESSION['userdata']) ? $_SESSION['userdata']['Upass'] : "tmp"; ?>",
+                        "uname": "<?php echo isset($_SESSION['userdata']) ? $_SESSION['userdata']['Uemail'] : 'tmp'; ?>",
+                        "upass": "<?php echo isset($_SESSION['userdata']) ? $_SESSION['userdata']['Upass'] : 'tmp'; ?>",
                         "want": "searchHealper",
                         "search": ($scope.find == "skill") ? getchips() : $scope.searchtxt,
                         "find": $scope.find,
@@ -817,7 +817,7 @@ if (isset($_GET['logout'])) {
                         </div>
                     </div>
                 </center>
-            <?php } else if (isset($_SESSION['userdata']) && isset($_GET['profile'])) { ?>
+            <?php } elseif (isset($_SESSION['userdata']) && isset($_GET['profile'])) { ?>
                 <div class="row"  >
                     <div class="container" ng-controller="userinfo">
                         <div class="dialogbox" id="editprofile" style="display:none;">
@@ -838,11 +838,11 @@ if (isset($_GET['logout'])) {
                                         </div>
                                         <script>
                                                 var availableTags = [<?php
-            $sql = "SELECT * FROM `skills` WHERE `SID` NOT IN (SELECT `SID` FROM `skills_of_user` NATURAL JOIN `skills` WHERE `UID`='" . antisqli($_SESSION['userdata']['UID']) . "')";
+            $sql = "SELECT * FROM `skills` WHERE `SID` NOT IN (SELECT `SID` FROM `skills_of_user` NATURAL JOIN `skills` WHERE `UID`='".antisqli($_SESSION['userdata']['UID'])."')";
             $query = mysqli_query($con, $sql);
 
             while ($row = mysqli_fetch_assoc($query)) {
-                echo '"' . $row['SID'] . ' - ' . $row['Sname'] . '",';
+                echo '"'.$row['SID'].' - '.$row['Sname'].'",';
             }
             ?>""];
                                                         $(function() {
@@ -866,7 +866,7 @@ if (isset($_GET['logout'])) {
                                             <ul id="skills" style="padding:0px" >
                                                 <?php
                                                 $txt = "<li class='simple skills' style='width:fit-content;display:block' indexid='data-0' value='data-1' >data-1 <i class='fa fa-times' onclick='removeskill(this);'></i></li>";
-                                                echo SearchToItems("`skills_of_user` NATURAL JOIN `skills`", array('SID', 'Sname'), "`UID`='" . antisqli($_SESSION['userdata']['UID']) . "'", $txt, array('SID', 'Sname'));
+                                                echo SearchToItems('`skills_of_user` NATURAL JOIN `skills`', ['SID', 'Sname'], "`UID`='".antisqli($_SESSION['userdata']['UID'])."'", $txt, ['SID', 'Sname']);
                                                 ?>
                                             </ul>
                                             <input id="tags" class="form-control simple">
@@ -876,7 +876,7 @@ if (isset($_GET['logout'])) {
                                             <select class="form-control simple" ng-model="Nuser.JID" >
                                                 <?php
                                                 $txt = "<option  value='data-0'>data-1</option>";
-                                                echo SearchToItems("`jobs`", array('JID', 'Jname'), "1", $txt, array('JID', 'Jname'));
+                                                echo SearchToItems('`jobs`', ['JID', 'Jname'], '1', $txt, ['JID', 'Jname']);
                                                 ?>
                                             </select>
                                         </div>
